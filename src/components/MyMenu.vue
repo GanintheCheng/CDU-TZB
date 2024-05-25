@@ -20,7 +20,14 @@ const store = useCounterStore()
     <el-row class="tac">
       <el-col :span="12">
         <h5 class="mb-2" style="菜单">菜单选取</h5>
-        <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" :router="true">
+        <el-menu default-active="dashboard" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose"
+          :router="true">
+          <el-menu-item index="dashboard" @click="store.TopName = '控制台'">
+            <el-icon>
+              <House />
+            </el-icon>
+            <span>控制台</span>
+          </el-menu-item>
           <el-sub-menu index="1">
             <template #title>
               <el-icon>
@@ -29,11 +36,11 @@ const store = useCounterStore()
               <span>城市拥堵</span>
             </template>
             <el-menu-item-group title="数据查询">
-              <el-menu-item index="nowdata" @click="store.TopName='实时数据查询'">实时数据查询</el-menu-item>
-              <el-menu-item index="backdata" @click="store.TopName='后台数据参数设置'">后台数据参数设置</el-menu-item>
+              <el-menu-item index="nowdata" @click="store.TopName = '实时数据查询'">实时数据查询</el-menu-item>
+              <el-menu-item index="backdata" @click="store.TopName = '后台数据参数设置'">后台数据参数设置</el-menu-item>
             </el-menu-item-group>
             <el-menu-item-group title="数据管理">
-              <el-menu-item index="backdatamanagement" @click="store.TopName='后台数据管理'">后台数据管理</el-menu-item>
+              <el-menu-item index="backdatamanagement" @click="store.TopName = '后台数据管理'">后台数据管理</el-menu-item>
             </el-menu-item-group>
           </el-sub-menu>
           <el-sub-menu index="2">

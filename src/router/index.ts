@@ -17,6 +17,13 @@ const router = createRouter({
     {
       path:"/changebackdata",
       component:()=>import("@/components/ChangeBackData.vue")
+    },{
+      path:"/dashboard",
+      component:()=>import("@/components/DashBoard.vue")
+    },
+    {
+      path:"/",
+      redirect:"/dashboard"
     }
   ],
 });
