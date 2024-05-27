@@ -72,10 +72,7 @@ const handleEdit = (index: number, row: User) => {
 const handleDelete = (index: number, row: User) => {
     axios({
         method: 'DELETE',
-        url: 'http://47.108.190.192:8090/crossing',
-        params: {
-            id: row.id
-        }
+        url: `http://47.108.190.192:8090/crossing/${row.id}`
     }).then(res => {
         if (res.data.code == 1) {
             getData()

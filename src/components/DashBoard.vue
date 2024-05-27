@@ -15,7 +15,7 @@ const getData = () => {
         method: 'GET',
         params: {
             page: 1,
-            pageSize: 4000
+            pageSize: 10000
         }
     })).then(res => {
         const total = res.data.data.total;
@@ -44,8 +44,8 @@ const getData = () => {
         Status.value = statusAverage;
     }).catch(error => {
         console.log(error);
-    }).finally(()=>{
-        loading.value=false
+    }).finally(() => {
+        loading.value = false
     })
 }
 onBeforeMount(() => {
@@ -60,7 +60,7 @@ onBeforeMount(() => {
         <div class="box" v-loading="loading">
             <div style="margin-bottom: 20px;">
                 城市拥堵情况平均值
-                <span style="font-size: small;">{{ date.getMonth() + 1 }}月{{ date.getDay() }}日</span>
+                <span style="font-size: small;">{{ date.getMonth() + 1 }}月{{ date.getDate() }}日</span>
             </div>
             <el-row :gutter="20">
                 <el-col :span="6">

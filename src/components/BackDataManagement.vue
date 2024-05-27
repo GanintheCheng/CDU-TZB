@@ -352,24 +352,34 @@ const search = () => {
 }
 //删除
 const goDelete = () => {
-    const ids = multipleSelection.value.map(record => record.id)
+    const ids = multipleSelection.value.map(record => record.id);
     console.log(ids);
+
+    // 拼接URL参数
+    const queryString = ids.map(id => `ids=${id}`).join('&');
+    const url = `http://47.108.190.192:8090/trafficInfo?${queryString}`;
+
     axios({
-        url: 'http://47.108.190.192:8090/trafficInfo',
+        url: url,
         method: 'DELETE',
-        params: {
-            ids: ids
-        }
     }).then((res) => {
-        if (res.data.status == 1) {
-            openSuccess('删除成功！')
+        if (res.data.code === 1) {
+            openSuccess('删除成功！');
+            getData({
+                page: currentPage.value,
+                pageSize: pageSize.value,
+                name: name.value,
+                description: description.value,
+                status: status.value,
+                blocked: block.value
+            })
         } else {
-            openError('??')
+            openError('删除失败！');
         }
     }).catch((error) => {
-        openError(error.response.status)
-    })
-}
+        openError(error.response.status);
+    });
+};
 const myDelete = () => {
     if (multipleSelection.value.length == 0) {
         openWarning('请检查是否选择了删除内容')
