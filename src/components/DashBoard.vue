@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import axios from 'axios';
+import  MapContainner  from '@/components/map/MapContainer.vue'
 import { onBeforeMount, ref } from 'vue';
 const date = ref(new Date())
 
@@ -15,7 +16,7 @@ const getData = () => {
         method: 'GET',
         params: {
             page: 1,
-            pageSize: 10000
+            pageSize: 30000
         }
     })).then(res => {
         const total = res.data.data.total;
@@ -110,7 +111,7 @@ onBeforeMount(() => {
             <div style="margin-bottom: 20px;">
                 城市地图
             </div>
-
+            <MapContainner/>
         </div>
     </div>
 </template>

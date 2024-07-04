@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { Search, Delete } from '@element-plus/icons-vue';
+//加载动画
 const loading = ref(true)
 const status = ref()
 const block = ref()
@@ -388,6 +389,22 @@ const myDelete = () => {
     goDelete()
     // openSuccess('删除成功')
 }
+//选择日期
+const value1 = ref('')
+//格式化日期
+function formatDate(date: Date): string {
+  const pad = (n: number): string => n < 10 ? '0' + n : n.toString();
+
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1); // 月份从0开始，所以要加1
+  const day = pad(date.getDate());
+
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+  const seconds = pad(date.getSeconds());
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
 </script>
 
 <template>
@@ -413,6 +430,14 @@ const myDelete = () => {
                     <el-select placeholder="道路拥堵值" size="large" style="width: 130px" v-model="block">
                         <el-option v-for="item in options2" :key="item.value" :label="item.label" :value="item.value" />
                     </el-select>
+                </div>
+                <div class="item">
+                    <span class="label">时间范围</span>
+                    <div class="block">
+                        <el-date-picker v-model="value1" type="datetimerange" range-separator="To"
+                            start-placeholder="Start date" end-placeholder="End date" size="large"
+                            style="width:200px" />
+                    </div>
                 </div>
                 <el-button type="primary" :icon="Search" class="bt" @click="search">查询</el-button>
             </div>
@@ -480,7 +505,7 @@ const myDelete = () => {
         }
 
         .input {
-            width: 130px;
+            width: 100px;
             height: 40px;
         }
 

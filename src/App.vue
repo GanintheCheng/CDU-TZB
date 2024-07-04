@@ -16,7 +16,7 @@ const store = useCounterStore()
         <TopView></TopView>
       </el-header>
       <el-container>
-        <el-aside width="200px" class="menu">
+        <el-aside class="menu" style="max-width: 200px;">
           <MyMenu></MyMenu>
         </el-aside>
         <el-container class="right">
