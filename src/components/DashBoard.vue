@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import axios from 'axios';
-import  MapContainner  from '@/components/map/MapContainer.vue'
+import MapContainner from '@/components/map/MapContainer.vue'
 import { onBeforeMount, ref } from 'vue';
 const date = ref(new Date())
 
@@ -10,41 +10,45 @@ const Blocked = ref()
 const Status = ref()
 const loading = ref(true)
 
+const formatDate = (date:any) => {
+  return date.toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).replace(/\//g, '-');
+};
+
 const getData = () => {
     axios(({
-        url: 'http://47.108.190.192:8090/trafficInfoPage',
+        url: 'http://47.108.190.192:8090/trafficInfo/average',
         method: 'GET',
         params: {
-            page: 1,
-            pageSize: 30000
+            beginDate: '2024-05-27',
+            endDate: formatDate(date.value),
+            beginTime:'11',
+            endTime:'18'
         }
     })).then(res => {
-        const total = res.data.data.total;
-        const records = res.data.data.records;
-        let expediteTotal = 0;
-        let congestedTotal = 0;
-        let blockedTotal = 0;
-        let statusTotal = 0;
+        // for (let i = 0, len = records.length; i < len; i++) {
+        //     const record = records[i];
+        //     expediteTotal += parseFloat(record.expedite);
+        //     congestedTotal += parseFloat(record.congested);
+        //     blockedTotal += parseFloat(record.blocked);
+        //     statusTotal += record.status;
+        // }
 
-        for (let i = 0, len = records.length; i < len; i++) {
-            const record = records[i];
-            expediteTotal += parseFloat(record.expedite);
-            congestedTotal += parseFloat(record.congested);
-            blockedTotal += parseFloat(record.blocked);
-            statusTotal += record.status;
-        }
+        // const expediteAverage = (expediteTotal / total).toFixed(2);
+        // const congestedAverage = (congestedTotal / total).toFixed(2);
+        // const blockedAverage = (blockedTotal / total).toFixed(2);
+        // const statusAverage = (statusTotal / total).toFixed(2);
 
-        const expediteAverage = (expediteTotal / total).toFixed(2);
-        const congestedAverage = (congestedTotal / total).toFixed(2);
-        const blockedAverage = (blockedTotal / total).toFixed(2);
-        const statusAverage = (statusTotal / total).toFixed(2);
-
-        Expedite.value = expediteAverage;
-        Congested.value = congestedAverage;
-        Blocked.value = blockedAverage;
-        Status.value = statusAverage;
+        Expedite.value = res.data.data.expediteAvg;
+        Congested.value = res.data.data.congestedAvg;
+        Blocked.value = res.data.data.blockedAvg;
+        Status.value = res.data.data.statusAvg;
     }).catch(error => {
         console.log(error);
+        console.log(12312312312312312);
     }).finally(() => {
         loading.value = false
     })
@@ -59,7 +63,7 @@ onBeforeMount(() => {
 <template>
     <div>
         <div class="box" v-loading="loading">
-            <div style="margin-bottom: 20px;">
+            <div style="margin-bottom: 20px;font-size: 20px;">
                 城市拥堵情况平均值
                 <span style="font-size: small;">{{ date.getMonth() + 1 }}月{{ date.getDate() }}日</span>
             </div>
@@ -67,7 +71,7 @@ onBeforeMount(() => {
                 <el-col :span="6">
                     <div class="grid-content ep-bg-purple">
                         <div class="title">
-                            拥堵平均占比:
+                            拥堵平均占比
                         </div>
                         <div class="content">
                             {{ Blocked }}%
@@ -77,7 +81,7 @@ onBeforeMount(() => {
                 <el-col :span="6">
                     <div class="grid-content ep-bg-purple">
                         <div class="title">
-                            缓慢平均占比:
+                            缓慢平均占比
                         </div>
                         <div class="content">
                             {{ Congested }}%
@@ -87,7 +91,7 @@ onBeforeMount(() => {
                 <el-col :span="6">
                     <div class="grid-content ep-bg-purple">
                         <div class="title">
-                            畅通平均占比:
+                            畅通平均占比
                         </div>
                         <div class="content">
                             {{ Expedite }}%
@@ -97,7 +101,7 @@ onBeforeMount(() => {
                 <el-col :span="6">
                     <div class="grid-content ep-bg-purple">
                         <div class="title">
-                            路况平均值:<span style="font-size: 10px;">1：畅通;2：缓行;3：拥堵</span>
+                            路况值平均值<span style="font-size: 10px;"></span>
                         </div>
 
                         <div class="content">
@@ -108,10 +112,10 @@ onBeforeMount(() => {
             </el-row>
         </div>
         <div class="box">
-            <div style="margin-bottom: 20px;">
+            <div style="margin-bottom: 20px;font-size: 20px;">
                 城市地图
             </div>
-            <MapContainner/>
+            <MapContainner />
         </div>
     </div>
 </template>
@@ -119,7 +123,9 @@ onBeforeMount(() => {
 <style scoped>
 .box {
     background-color: white;
-    padding: 20px;
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
     margin-bottom: 40px;
 }
 
@@ -152,12 +158,13 @@ onBeforeMount(() => {
 }
 
 .title {
-    font-size: larger;
-    margin-bottom: 20px;
+    font-size: 12px;
+    font-weight: bolder;
+    margin-bottom: 10px;
 }
 
 .content {
-    font-size: xx-large;
+    font-size: 18px;
     font-weight: 900;
 }
 </style>

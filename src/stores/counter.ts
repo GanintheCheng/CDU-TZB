@@ -66,5 +66,7 @@ export const useCounterStore = defineStore("counter", () => {
     },
   ];
   const TopName = "控制台";
-  return { count, doubleCount, increment, TopName, backData };
+  const isInput = false;
+  const isLog = false;
+  return { count, doubleCount, increment, TopName, backData, isInput, isLog };
 });

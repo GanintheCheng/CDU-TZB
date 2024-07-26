@@ -1,5 +1,6 @@
 import "@/font/font.css";
 
+import 'amfe-flexible'
 import { createApp } from "vue";
 import { createPinia } from "pinia";
 import * as ElementPlusIconsVue from "@element-plus/icons-vue";

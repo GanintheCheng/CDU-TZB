@@ -20,6 +20,9 @@ const router = createRouter({
     },{
       path:"/dashboard",
       component:()=>import("@/components/DashBoard.vue")
+    },{
+      path:"/questionnaire",
+      component:()=>import("@/components/QuestionNaire.vue")
     },
     {
       path:"/",

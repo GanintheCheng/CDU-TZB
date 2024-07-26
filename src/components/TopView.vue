@@ -33,12 +33,29 @@ import { Edit, View as IconView } from '@element-plus/icons-vue'
         }
 
         .text {
-            font-weight: 300;
+            font-weight: 900;
             color: #000;
-            font-size: x-large;
+            font-size: 15px;
+            /* 初始的字体阴影效果 */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            /* 可以根据需要调整阴影的偏移量、模糊半径和颜色 */
+            transition: text-shadow 0.3s ease;
+            /* 平滑过渡效果 */
+        }
+
+        .text:hover {
+            /* 鼠标悬停时的字体阴影效果 */
+            text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5),
+                0px 0px 20px rgba(255, 255, 255, 0.5),
+                0px 0px 30px rgba(255, 255, 255, 0.5),
+                0px 0px 40px rgba(255, 255, 255, 0.5);
+            /* 这里使用了多层阴影来创建更丰富的效果，可以根据喜好调整 */
+            /* color: #fff; */
+            /* 可以改变文字颜色以配合阴影效果 */
         }
     }
-    .right{
+
+    .right {
         background-color: #a0cfff;
     }
 }

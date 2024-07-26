@@ -316,7 +316,7 @@ const getData = (params: RequestParams) => {
     }
 
     axios(({
-        url: 'http://47.108.190.192:8090/trafficInfoPage',
+        url: 'http://47.108.190.192:8090/trafficInfo/trafficInfoPage',
         method: 'GET',
         params: queryParams
     })).then(res => {
@@ -390,20 +390,22 @@ const myDelete = () => {
     // openSuccess('删除成功')
 }
 //选择日期
-const value1 = ref('')
+const value1 = ref()
 //格式化日期
-function formatDate(date: Date): string {
-  const pad = (n: number): string => n < 10 ? '0' + n : n.toString();
+function formatDate(date?: Date): string {
+    if (!date) return ''; // 如果 date 是 undefined 或 null，返回空字符串
 
-  const year = date.getFullYear();
-  const month = pad(date.getMonth() + 1); // 月份从0开始，所以要加1
-  const day = pad(date.getDate());
+    const pad = (n: number): string => n < 10 ? '0' + n : n.toString();
 
-  const hours = pad(date.getHours());
-  const minutes = pad(date.getMinutes());
-  const seconds = pad(date.getSeconds());
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1); // 月份从0开始，所以要加1
+    const day = pad(date.getDate());
 
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    const hours = pad(date.getHours());
+    const minutes = pad(date.getMinutes());
+    const seconds = pad(date.getSeconds());
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 </script>
 
@@ -432,17 +434,18 @@ function formatDate(date: Date): string {
                     </el-select>
                 </div>
                 <div class="item">
-                    <span class="label">时间范围</span>
+                    <span class="label">时间范围:</span>
                     <div class="block">
                         <el-date-picker v-model="value1" type="datetimerange" range-separator="To"
                             start-placeholder="Start date" end-placeholder="End date" size="large"
-                            style="width:200px" />
+                            style="width:180px" />
                     </div>
                 </div>
                 <el-button type="primary" :icon="Search" class="bt" @click="search">查询</el-button>
+                <el-button type="danger" :icon="Delete" class="bt" @click="myDelete">批量删除</el-button>
             </div>
             <div class="right">
-                <el-button type="danger" :icon="Delete" class="bt" @click="myDelete">批量删除</el-button>
+
             </div>
         </div>
         <div v-loading="loading"><el-table ref="multipleTableRef" :data="tableData"
@@ -473,7 +476,8 @@ function formatDate(date: Date): string {
         <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[10, 20, 30, 40]"
             :small="small" :disabled="disabled" :background="background"
             layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange"
-            @current-change="handleCurrentChange" style="display: flex;justify-content: center;" />
+            @current-change="handleCurrentChange" class="big"/>
+        <el-pagination background layout="pager" :total="total" pager-count="4" @current-change="handleCurrentChange" class="small"/>
     </div>
 
 </template>
@@ -487,11 +491,14 @@ function formatDate(date: Date): string {
 
     .left {
         display: flex;
+        width: 100%;
+        flex-wrap: wrap;
 
         .item {
             display: flex;
             align-items: center;
             margin-right: 10px;
+            margin-bottom: 10px;
             /* 垂直对齐中心 */
         }
 
@@ -522,5 +529,33 @@ function formatDate(date: Date): string {
     height: 40px;
     width: 80px;
     font-weight: 700;
+}
+
+.el-pagination {
+    justify-content: center;
+}
+
+.big{
+    display: flex;
+}
+
+.small{
+    display: none;
+}
+
+@media only screen and (max-width: 768px) {
+    .el-pagination {
+        justify-content: left;
+        flex-wrap: wrap;
+    }
+
+    .big{
+        display: none;
+    }
+
+    .small{
+        display: flex;
+    }
+
 }
 </style>

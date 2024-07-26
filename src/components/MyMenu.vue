@@ -19,7 +19,7 @@ const store = useCounterStore()
   <div>
     <el-row class="tac">
       <el-col :span="12">
-        <h5 class="mb-2" style="菜单">菜单选取</h5>
+        <h5 class="mb-2" style="text-wrap: nowrap;">菜单选取</h5>
         <el-menu default-active="dashboard" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose"
           :router="true">
           <el-menu-item index="dashboard" @click="store.TopName = '控制台'">
@@ -48,19 +48,19 @@ const store = useCounterStore()
               <el-icon>
                 <location />
               </el-icon>
-              <span>地图一览</span>
+              <span>用户数据与反馈</span>
             </template>
-            <el-menu-item-group title="待补充">
-              <el-menu-item index="2-1">待补充</el-menu-item>
-              <el-menu-item index="2-2">待补充</el-menu-item>
+            <el-menu-item-group title="数据收集">
+              <el-menu-item index="questionnaire" @click="store.TopName = '调查问卷'">调查问卷</el-menu-item>
+              <!-- <el-menu-item index="2-2">待补充</el-menu-item> -->
             </el-menu-item-group>
-            <el-menu-item-group title="待补充">
-              <el-menu-item index="2-3">待补充</el-menu-item>
+            <el-menu-item-group title="意见反馈">
+              <el-menu-item index="2-3">意见反馈</el-menu-item>
             </el-menu-item-group>
-            <el-sub-menu index="2-4">
+            <!-- <el-sub-menu index="2-4">
               <template #title>待补充</template>
               <el-menu-item index="2-4-1">待补充</el-menu-item>
-            </el-sub-menu>
+            </el-sub-menu> -->
           </el-sub-menu>
           <el-sub-menu index="3">
             <template #title>

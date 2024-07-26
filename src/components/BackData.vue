@@ -5,6 +5,7 @@ import { ElNotification, ElTable, rowProps } from 'element-plus'
 import { useCounterStore } from '@/stores/counter'
 import axios from 'axios'
 import { ro } from 'element-plus/es/locale/index.mjs'
+import { ElMessage, ElMessageBox } from 'element-plus'
 //点击添加后的切换页面逻辑
 const router = useRouter()
 // import { computed } from 'vue';
@@ -105,11 +106,33 @@ onMounted(() => {
 })
 
 const loading = ref(true)
+const isLop = ref(store.isLog)
 // const nowName = ref('null')
+//弹出
+const open = () => {
+    ElMessageBox.prompt('请输入密钥', '管理员确认', {
+        confirmButtonText: '确认',
+        cancelButtonText: '退出'
+    })
+        .then(({ value }) => {
+            if (value == 'lstlst') {
+                ElMessage({
+                    type: 'success',
+                    message: `密码正确`,
+                })
+            } else {
+                ElMessage({
+                    type: 'error',
+                    message: `密码错误`,
+                })
+            }
+        })
+}
+
 </script>
 
 <template>
-    <div style="max-width: 800px;">
+    <div style="max-width: 800px;" v-if="isLop">
         参数一览:<el-button type="primary" @click="change" style="float: right;">增加</el-button><br /><br />
         <el-table ref="singleTableRef" :data="tableData" highlight-current-row style="width: 100%"
             @current-change="handleCurrentChange" v-loading="loading">
@@ -132,6 +155,11 @@ const loading = ref(true)
                 </template>
             </el-table-column>
         </el-table>
+    </div>
+    <div v-else>
+        <el-empty description="未登录管理员 无法访问该页面">
+            <el-button type="primary" @click="open()">输入密钥</el-button>
+        </el-empty>
     </div>
 </template>
 
