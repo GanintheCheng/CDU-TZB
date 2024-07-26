@@ -54,7 +54,7 @@ const handleEdit = (index: number, row: User) => {
     let nowForbidden = store.backData[index].forbidden
     axios({
         method: 'put',
-        url: 'http://47.108.190.192:8090/crossing',
+        url: 'https://city.cybercodefarmer.group/api/crossing',
         data: {
             id: row.id,
             forbidden: nowForbidden
@@ -73,7 +73,7 @@ const handleEdit = (index: number, row: User) => {
 const handleDelete = (index: number, row: User) => {
     axios({
         method: 'DELETE',
-        url: `http://47.108.190.192:8090/crossing/${row.id}`
+        url: `https://city.cybercodefarmer.group/api/crossing/${row.id}`
     }).then(res => {
         if (res.data.code == 1) {
             getData()
@@ -88,7 +88,7 @@ const getData = () => {
     loading.value = true
     axios({
         method: 'get',
-        url: 'http://47.108.190.192:8090/crossing'
+        url: 'https://city.cybercodefarmer.group/api/crossing'
     }).then(res => {
         store.backData = res.data.data
         tableData.value = res.data.data
@@ -106,7 +106,7 @@ onMounted(() => {
 })
 
 const loading = ref(true)
-const isLop = ref(store.isLog)
+const isLog = ref(store.isLog)
 // const nowName = ref('null')
 //弹出
 const open = () => {
@@ -120,6 +120,8 @@ const open = () => {
                     type: 'success',
                     message: `密码正确`,
                 })
+                isLog.value = true
+                store.isLog = true
             } else {
                 ElMessage({
                     type: 'error',
@@ -132,7 +134,7 @@ const open = () => {
 </script>
 
 <template>
-    <div style="max-width: 800px;" v-if="isLop">
+    <div style="max-width: 1200px;" v-if="isLog">
         参数一览:<el-button type="primary" @click="change" style="float: right;">增加</el-button><br /><br />
         <el-table ref="singleTableRef" :data="tableData" highlight-current-row style="width: 100%"
             @current-change="handleCurrentChange" v-loading="loading">
@@ -140,6 +142,8 @@ const open = () => {
             <el-table-column property="name" label="name" width="180" />
             <el-table-column property="level" label="level" width="120" />
             <el-table-column property="position" label="position" />
+            <el-table-column property="region" label="region" />
+            <el-table-column property="cityCode" label="cityCode" />
             <el-table-column label="点击切换状态">
                 <template #default="scope">
                     <el-button size="small" @click="handleEdit(scope.$index, scope.row)" type="danger"
@@ -151,6 +155,10 @@ const open = () => {
                     </el-button>
                     <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">
                         删除
+                    </el-button>
+                    <!-- @click="router.push(`/crossinganalysis?id=${scope.row.id}`)" -->
+                    <el-button size="small" type="success" :info="scope.row" @click="router.push(`/crossinganalysis?id=${scope.row.id}&&name=${scope.row.name}`)">
+                        分析
                     </el-button>
                 </template>
             </el-table-column>

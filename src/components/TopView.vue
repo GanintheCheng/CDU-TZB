@@ -6,7 +6,7 @@ import { Edit, View as IconView } from '@element-plus/icons-vue'
     <div class="top">
         <div class="left">
             <img src="@/static/cdu.png" alt="">
-            <div class="text">城市病治理管理平台</div>
+            <div class="text">城市交通病治理管理平台</div>
         </div>
         <div class="right">
             <el-link type="danger" target="_blank" href="https://computer.cdu.edu.cn/" :icon="Edit">友情连接</el-link>

@@ -15,19 +15,37 @@ const router = createRouter({
       component: () => import("@/components/BackDataManagement.vue"),
     },
     {
-      path:"/changebackdata",
-      component:()=>import("@/components/ChangeBackData.vue")
-    },{
-      path:"/dashboard",
-      component:()=>import("@/components/DashBoard.vue")
-    },{
-      path:"/questionnaire",
-      component:()=>import("@/components/QuestionNaire.vue")
+      path: "/changebackdata",
+      component: () => import("@/components/ChangeBackData.vue"),
     },
     {
-      path:"/",
-      redirect:"/dashboard"
-    }
+      path: "/dashboard",
+      component: () => import("@/components/DashBoard.vue"),
+    },
+    {
+      path: "/questionnaire",
+      component: () => import("@/components/QuestionNaire.vue"),
+    },
+    {
+      path: "/feedback",
+      component: () => import("@/components/FeedBack.vue"),
+    },
+    {
+      path: "/crossinganalysis",
+      component: () => import("@/components/CrossingAnalysis.vue"),
+    },
+    {
+      path: "/aboutus",
+      component: () => import("@/components/AboutUs.vue"),
+    },
+    {
+      path: "/showresult",
+      component: () => import("@/components/ShowResult.vue"),
+    },
+    {
+      path: "/",
+      redirect: "/dashboard",
+    },
   ],
 });
 

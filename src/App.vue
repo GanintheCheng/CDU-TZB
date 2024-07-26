@@ -8,6 +8,31 @@ import { ElDrawer } from 'element-plus'
 
 const store = useCounterStore()
 const isDrawerVisible = ref(false)
+
+import { watch } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+watch(() => route.fullPath, (newPath:string, oldPath:string) => {
+  if(newPath.includes('/dashboard')){
+    store.TopName = '控制台'
+  }else if(newPath.includes('/nowdata')){
+    store.TopName = '实时数据查询'
+  }else if(newPath.includes('/backdata')){
+    store.TopName = '后台数据参数设置'
+  }else if(newPath.includes('/backdatamanagement')){
+    store.TopName = '后台数据管理'
+  }else if(newPath.includes('/questionnaire')){
+    store.TopName = '调查问卷'
+  }else if(newPath.includes('/feedback')){
+    store.TopName = '意见反馈'
+  }else if(newPath.includes('/crossinganalysis')){
+    store.TopName = '路口分析'
+  }else if(newPath.includes('/aboutus')){
+    store.TopName = '关于我们'
+  }
+})
 </script>
 
 <template>

@@ -20,7 +20,7 @@ const formatDate = (date:any) => {
 
 const getData = () => {
     axios(({
-        url: 'http://47.108.190.192:8090/trafficInfo/average',
+        url: 'https://city.cybercodefarmer.group/api/trafficInfo/average',
         method: 'GET',
         params: {
             beginDate: '2024-05-27',

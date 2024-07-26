@@ -20,7 +20,7 @@ const store = useCounterStore()
     <el-row class="tac">
       <el-col :span="12">
         <h5 class="mb-2" style="text-wrap: nowrap;">菜单选取</h5>
-        <el-menu default-active="dashboard" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose"
+        <el-menu class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose"
           :router="true">
           <el-menu-item index="dashboard" @click="store.TopName = '控制台'">
             <el-icon>
@@ -55,7 +55,10 @@ const store = useCounterStore()
               <!-- <el-menu-item index="2-2">待补充</el-menu-item> -->
             </el-menu-item-group>
             <el-menu-item-group title="意见反馈">
-              <el-menu-item index="2-3">意见反馈</el-menu-item>
+              <el-menu-item index="feedback" @click="store.TopName = '意见反馈'">意见反馈</el-menu-item>
+            </el-menu-item-group>
+            <el-menu-item-group title="结果展示">
+              <el-menu-item index="showresult" @click="store.TopName = '结果展示'">结果展示</el-menu-item>
             </el-menu-item-group>
             <!-- <el-sub-menu index="2-4">
               <template #title>待补充</template>
@@ -69,23 +72,15 @@ const store = useCounterStore()
               </el-icon>
               <span>解决方案</span>
             </template>
-            <el-menu-item-group title="待补充">
-              <el-menu-item index="3-1">待补充</el-menu-item>
-              <el-menu-item index="3-2">待补充</el-menu-item>
+            <el-menu-item-group title="统计">
+              <el-menu-item index="crossinganalysis" @click="store.TopName = '路口分析'">路口分析</el-menu-item>
             </el-menu-item-group>
-            <el-menu-item-group title="待补充">
-              <el-menu-item index="3-3">待补充</el-menu-item>
-            </el-menu-item-group>
-            <el-sub-menu index="3-4">
-              <template #title>待补充</template>
-              <el-menu-item index="3-4-1">待补充</el-menu-item>
-            </el-sub-menu>
           </el-sub-menu>
-          <el-menu-item index="4">
+          <el-menu-item index="aboutus">
             <el-icon>
               <setting />
             </el-icon>
-            <span>全局设置</span>
+            <span>关于我们</span>
           </el-menu-item>
         </el-menu>
       </el-col>

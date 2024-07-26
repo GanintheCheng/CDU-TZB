@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { Search, Delete } from '@element-plus/icons-vue';
+import { useCounterStore } from '@/stores/counter'
+import { ElMessage, ElMessageBox } from 'element-plus'
+//store定义
+const store = useCounterStore()
 //加载动画
 const loading = ref(true)
 const status = ref()
@@ -316,7 +320,7 @@ const getData = (params: RequestParams) => {
     }
 
     axios(({
-        url: 'http://47.108.190.192:8090/trafficInfo/trafficInfoPage',
+        url: 'https://city.cybercodefarmer.group/api/trafficInfo/trafficInfoPage',
         method: 'GET',
         params: queryParams
     })).then(res => {
@@ -358,7 +362,7 @@ const goDelete = () => {
 
     // 拼接URL参数
     const queryString = ids.map(id => `ids=${id}`).join('&');
-    const url = `http://47.108.190.192:8090/trafficInfo?${queryString}`;
+    const url = `https://city.cybercodefarmer.group/api/trafficInfo?${queryString}`;
 
     axios({
         url: url,
@@ -407,6 +411,29 @@ function formatDate(date?: Date): string {
 
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
+//islog
+const isLog = ref(store.isLog)
+const open = () => {
+    ElMessageBox.prompt('请输入密钥', '管理员确认', {
+        confirmButtonText: '确认',
+        cancelButtonText: '退出'
+    })
+        .then(({ value }) => {
+            if (value == 'lstlst') {
+                ElMessage({
+                    type: 'success',
+                    message: `密码正确`,
+                })
+                isLog.value = true
+                store.isLog = true
+            } else {
+                ElMessage({
+                    type: 'error',
+                    message: `密码错误`,
+                })
+            }
+        })
+}
 </script>
 
 <template>
@@ -442,7 +469,8 @@ function formatDate(date?: Date): string {
                     </div>
                 </div>
                 <el-button type="primary" :icon="Search" class="bt" @click="search">查询</el-button>
-                <el-button type="danger" :icon="Delete" class="bt" @click="myDelete">批量删除</el-button>
+                <el-button type="danger" :icon="Delete" class="bt" @click="myDelete" v-if="isLog">批量删除</el-button>
+                <el-button type="primary" :icon="Search" class="bt" @click="open" v-else>登录解锁</el-button>
             </div>
             <div class="right">
 
@@ -476,8 +504,9 @@ function formatDate(date?: Date): string {
         <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[10, 20, 30, 40]"
             :small="small" :disabled="disabled" :background="background"
             layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange"
-            @current-change="handleCurrentChange" class="big"/>
-        <el-pagination background layout="pager" :total="total" pager-count="4" @current-change="handleCurrentChange" class="small"/>
+            @current-change="handleCurrentChange" class="big" />
+        <el-pagination background layout="pager" :total="total" pager-count="4" @current-change="handleCurrentChange"
+            class="small" />
     </div>
 
 </template>
@@ -535,11 +564,11 @@ function formatDate(date?: Date): string {
     justify-content: center;
 }
 
-.big{
+.big {
     display: flex;
 }
 
-.small{
+.small {
     display: none;
 }
 
@@ -549,11 +578,11 @@ function formatDate(date?: Date): string {
         flex-wrap: wrap;
     }
 
-    .big{
+    .big {
         display: none;
     }
 
-    .small{
+    .small {
         display: flex;
     }
 
