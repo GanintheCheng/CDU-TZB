@@ -2,81 +2,45 @@
 import { onMounted, ref } from 'vue';
 import { Search, Delete } from '@element-plus/icons-vue';
 import { useCounterStore } from '@/stores/counter'
-import { ElMessage, ElMessageBox } from 'element-plus'
-//store定义
-const store = useCounterStore()
-//加载动画
-const loading = ref(true)
-const status = ref()
-const block = ref()
-const description = ref()
-const options1 = [
-    {
-        value: '',
-        label: '清空'
-    },
-    {
-        value: '0',
-        label: '0:未知'
-    },
-    {
-        value: '1',
-        label: '1:畅通'
-    },
-    {
-        value: '2',
-        label: '2:缓行'
-    },
-    {
-        value: '3',
-        label: '3:拥堵'
-    }
-]
-const options2 = [
-    {
-        value: '',
-        label: '清空'
-    },
-    {
-        value: '0-10',
-        label: '0-10%',
-    },
-    {
-        value: '10-20',
-        label: '10%-20%',
-    },
-    {
-        value: '20-30',
-        label: '20%-30%',
-    },
-    {
-        value: '30-40',
-        label: '30%-40%',
-    },
-    {
-        value: '40-50',
-        label: '40%-50%',
-    },
-    {
-        value: '50-60',
-        label: '50%-60%',
-    },
-    {
-        value: '60-70',
-        label: '60%-70%',
-    },
-    {
-        value: '70-80',
-        label: '70%-80%',
-    },
-    {
-        value: '90-100',
-        label: '90%-100%',
-    }
-]
-const name = ref()
-import { ElNotification, ElTable } from 'element-plus'
+import { ElMessage, ElMessageBox, ElNotification, ElTable } from 'element-plus';
 import axios from 'axios';
+
+const store = useCounterStore();
+const loading = ref(true);
+const status = ref();
+const block = ref();
+const description = ref();
+const name = ref();
+const currentPage = ref(1);
+const pageSize = ref(10);
+const total = ref(0);
+const small = ref(false);
+const background = ref(false);
+const disabled = ref(false);
+const value1 = ref('');
+const isLog = ref(store.isLog);
+const tableData = ref([]);
+const multipleTableRef = ref<InstanceType<typeof ElTable>>();
+const multipleSelection = ref([]);
+const options1 = [
+    { value: '', label: '清空' },
+    { value: '0', label: '0:未知' },
+    { value: '1', label: '1:畅通' },
+    { value: '2', label: '2:缓行' },
+    { value: '3', label: '3:拥堵' }
+];
+const options2 = [
+    { value: '', label: '清空' },
+    { value: '0-10', label: '0-10%' },
+    { value: '10-20', label: '10%-20%' },
+    { value: '20-30', label: '20%-30%' },
+    { value: '30-40', label: '30%-40%' },
+    { value: '40-50', label: '40%-50%' },
+    { value: '50-60', label: '50%-60%' },
+    { value: '60-70', label: '60%-70%' },
+    { value: '70-80', label: '70%-80%' },
+    { value: '90-100', label: '90%-100%' }
+];
 
 interface records {
     blocked: string;
@@ -91,200 +55,57 @@ interface records {
     unknown: string;
 }
 
-const multipleTableRef = ref<InstanceType<typeof ElTable>>()
-const multipleSelection = ref<records[]>([])
 const toggleSelection = (rows?: records[]) => {
     if (rows) {
         rows.forEach((row) => {
-            // TODO: improvement typing when refactor table
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
-            multipleTableRef.value!.toggleRowSelection(row, undefined)
-        })
+            multipleTableRef.value!.toggleRowSelection(row, undefined);
+        });
     } else {
-        multipleTableRef.value!.clearSelection()
+        multipleTableRef.value!.clearSelection();
     }
-}
-const handleSelectionChange = (val: records[]) => {
-    multipleSelection.value = val
-    console.log(multipleSelection.value)
-}
-const tableData = ref<records[]>([
-    {
-        id: 46,
-        name: "万象城双桥路(成都东)",
-        expedite: "84.31%",
-        congested: "13.73%",
-        blocked: "1.96%",
-        unknown: "0.00%",
-        status: 2,
-        createTime: "2024-05-22T19:39:03",
-        description: "二环高架路：从杉板桥立交到二环高架路入口严重拥堵；水碾河路：从一环路东四段到水碾河南街行驶缓慢；双福二路：从双成二路到二环路东三段行驶缓慢；双林北支路：从二环路东三段到双林北横路行驶缓慢；二环路东三段：双桥子立交桥附近自南向北行驶缓慢。",
-        crossingId: 8
-    },
-    {
-        id: 46,
-        name: "万象城双桥路(成都东)",
-        expedite: "84.31%",
-        congested: "13.73%",
-        blocked: "1.96%",
-        unknown: "0.00%",
-        status: 2,
-        createTime: "2024-05-22T19:39:03",
-        description: "二环高架路：从杉板桥立交到二环高架路入口严重拥堵；水碾河路：从一环路东四段到水碾河南街行驶缓慢；双福二路：从双成二路到二环路东三段行驶缓慢；双林北支路：从二环路东三段到双林北横路行驶缓慢；二环路东三段：双桥子立交桥附近自南向北行驶缓慢。",
-        crossingId: 8
-    },
-    {
-        id: 46,
-        name: "万象城双桥路(成都东)",
-        expedite: "84.31%",
-        congested: "13.73%",
-        blocked: "1.96%",
-        unknown: "0.00%",
-        status: 2,
-        createTime: "2024-05-22T19:39:03",
-        description: "二环高架路：从杉板桥立交到二环高架路入口严重拥堵；水碾河路：从一环路东四段到水碾河南街行驶缓慢；双福二路：从双成二路到二环路东三段行驶缓慢；双林北支路：从二环路东三段到双林北横路行驶缓慢；二环路东三段：双桥子立交桥附近自南向北行驶缓慢。",
-        crossingId: 8
-    },
-    {
-        id: 46,
-        name: "万象城双桥路(成都东)",
-        expedite: "84.31%",
-        congested: "13.73%",
-        blocked: "1.96%",
-        unknown: "0.00%",
-        status: 2,
-        createTime: "2024-05-22T19:39:03",
-        description: "二环高架路：从杉板桥立交到二环高架路入口严重拥堵；水碾河路：从一环路东四段到水碾河南街行驶缓慢；双福二路：从双成二路到二环路东三段行驶缓慢；双林北支路：从二环路东三段到双林北横路行驶缓慢；二环路东三段：双桥子立交桥附近自南向北行驶缓慢。",
-        crossingId: 8
-    },
-    {
-        id: 46,
-        name: "万象城双桥路(成都东)",
-        expedite: "84.31%",
-        congested: "13.73%",
-        blocked: "1.96%",
-        unknown: "0.00%",
-        status: 2,
-        createTime: "2024-05-22T19:39:03",
-        description: "二环高架路：从杉板桥立交到二环高架路入口严重拥堵；水碾河路：从一环路东四段到水碾河南街行驶缓慢；双福二路：从双成二路到二环路东三段行驶缓慢；双林北支路：从二环路东三段到双林北横路行驶缓慢；二环路东三段：双桥子立交桥附近自南向北行驶缓慢。",
-        crossingId: 8
-    },
-    {
-        id: 46,
-        name: "万象城双桥路(成都东)",
-        expedite: "84.31%",
-        congested: "13.73%",
-        blocked: "1.96%",
-        unknown: "0.00%",
-        status: 2,
-        createTime: "2024-05-22T19:39:03",
-        description: "二环高架路：从杉板桥立交到二环高架路入口严重拥堵；水碾河路：从一环路东四段到水碾河南街行驶缓慢；双福二路：从双成二路到二环路东三段行驶缓慢；双林北支路：从二环路东三段到双林北横路行驶缓慢；二环路东三段：双桥子立交桥附近自南向北行驶缓慢。",
-        crossingId: 8
-    },
-    {
-        id: 46,
-        name: "万象城双桥路(成都东)",
-        expedite: "84.31%",
-        congested: "13.73%",
-        blocked: "1.96%",
-        unknown: "0.00%",
-        status: 2,
-        createTime: "2024-05-22T19:39:03",
-        description: "二环高架路：从杉板桥立交到二环高架路入口严重拥堵；水碾河路：从一环路东四段到水碾河南街行驶缓慢；双福二路：从双成二路到二环路东三段行驶缓慢；双林北支路：从二环路东三段到双林北横路行驶缓慢；二环路东三段：双桥子立交桥附近自南向北行驶缓慢。",
-        crossingId: 8
-    }, {
-        id: 46,
-        name: "万象城双桥路(成都东)",
-        expedite: "84.31%",
-        congested: "13.73%",
-        blocked: "1.96%",
-        unknown: "0.00%",
-        status: 2,
-        createTime: "2024-05-22T19:39:03",
-        description: "二环高架路：从杉板桥立交到二环高架路入口严重拥堵；水碾河路：从一环路东四段到水碾河南街行驶缓慢；双福二路：从双成二路到二环路东三段行驶缓慢；双林北支路：从二环路东三段到双林北横路行驶缓慢；二环路东三段：双桥子立交桥附近自南向北行驶缓慢。",
-        crossingId: 8
-    },
-    {
-        id: 46,
-        name: "万象城双桥路(成都东)",
-        expedite: "84.31%",
-        congested: "13.73%",
-        blocked: "1.96%",
-        unknown: "0.00%",
-        status: 2,
-        createTime: "2024-05-22T19:39:03",
-        description: "二环高架路：从杉板桥立交到二环高架路入口严重拥堵；水碾河路：从一环路东四段到水碾河南街行驶缓慢；双福二路：从双成二路到二环路东三段行驶缓慢；双林北支路：从二环路东三段到双林北横路行驶缓慢；二环路东三段：双桥子立交桥附近自南向北行驶缓慢。",
-        crossingId: 8
-    },
-    {
-        id: 46,
-        name: "万象城双桥路(成都东)",
-        expedite: "84.31%",
-        congested: "13.73%",
-        blocked: "1.96%",
-        unknown: "0.00%",
-        status: 2,
-        createTime: "2024-05-22T19:39:03",
-        description: "二环高架路：从杉板桥立交到二环高架路入口严重拥堵；水碾河路：从一环路东四段到水碾河南街行驶缓慢；双福二路：从双成二路到二环路东三段行驶缓慢；双林北支路：从二环路东三段到双林北横路行驶缓慢；二环路东三段：双桥子立交桥附近自南向北行驶缓慢。",
-        crossingId: 8
-    },
-])
+};
 
-const currentPage = ref(1)
-const pageSize = ref(10)
-const total = ref(0)
-const small = ref(false)
-const background = ref(false)
-const disabled = ref(false)
+const handleSelectionChange = (val: records[]) => {
+    multipleSelection.value = val;
+    console.log(multipleSelection.value);
+};
 
 const handleSizeChange = (val: number) => {
-    console.log(`${val} items per page`)
-    pageSize.value = val
-    getData({
-        page: currentPage.value,
-        pageSize: pageSize.value,
-        name: name.value,
-        description: description.value,
-        status: status.value,
-        blocked: block.value
-    })
-}
+    console.log(`${val} items per page`);
+    pageSize.value = val;
+    search();
+};
+
 const handleCurrentChange = (val: number) => {
-    console.log(`current page: ${val}`)
-    currentPage.value = val
-    getData({
-        page: currentPage.value,
-        pageSize: pageSize.value,
-        name: name.value,
-        description: description.value,
-        status: status.value,
-        blocked: block.value
-    })
-}
-//弹出层 
+    console.log(`current page: ${val}`);
+    currentPage.value = val;
+    search();
+};
+
 const openSuccess = (message: string) => {
     ElNotification({
         title: 'Success',
         message: message,
         type: 'success',
-    })
-}
+    });
+};
+
 const openWarning = (message: string) => {
     ElNotification({
         title: 'Warning',
         message: message,
         type: 'warning',
-    })
-}
+    });
+};
+
 const openError = (message: string) => {
     ElNotification({
         title: 'Error',
         message: '失败,错误码为' + message + ',请联系管理员',
         type: 'error',
-    })
-}
-//请求
+    });
+};
+
 interface RequestParams {
     page?: number;
     pageSize?: number;
@@ -292,14 +113,13 @@ interface RequestParams {
     description?: string;
     status?: string;
     blocked?: boolean;
+    beginTime?: string;
 }
 
 const getData = (params: RequestParams) => {
-    // const params
-    // 创建一个空对象来存储最终请求参数
     const queryParams: { [key: string]: any } = {};
-    loading.value = true
-    // 动态添加参数
+    loading.value = true;
+
     if (params.page !== undefined) {
         queryParams.page = params.page;
     }
@@ -318,123 +138,79 @@ const getData = (params: RequestParams) => {
     if (params.blocked !== undefined) {
         queryParams.blocked = params.blocked;
     }
+    if (params.beginTime !== undefined) {
+        queryParams.beginTime = params.beginTime;
+    }
 
-    axios(({
-        url: 'https://city.cybercodefarmer.group/api/trafficInfo/trafficInfoPage',
-        method: 'GET',
-        params: queryParams
-    })).then(res => {
-        const data = res.data.data.records as records[]
-        tableData.value = data
-        total.value = res.data.data.total
-        openSuccess('后台数据加载成功')
-    }).catch(error => {
-        openError(error.response.status)
-    }).finally(() => {
-        loading.value = false
-    })
-}
-onMounted(() => {
-    getData({
-        page: currentPage.value,
-        pageSize: pageSize.value,
-        name: name.value,
-        description: description.value,
-        status: status.value,
-        blocked: block.value
-    })
-})
-//条件查询
+    axios.get('https://city.cybercodefarmer.group/api/trafficInfo/trafficInfoPage', { params: queryParams })
+        .then(res => {
+            tableData.value = res.data.data.records as records[];
+            total.value = res.data.data.total;
+            openSuccess('后台数据加载成功');
+        })
+        .catch(error => {
+            openError(error.response.status);
+        })
+        .finally(() => {
+            loading.value = false;
+        });
+};
+
 const search = () => {
+    // 检查 value1.value 是否为有效的数组并且有两个元素
+    const beginTime = (Array.isArray(value1.value) && value1.value.length > 0) ? value1.value[0] : undefined;
+    const endTime = (Array.isArray(value1.value) && value1.value.length > 1) ? value1.value[1] : undefined;
+
+    // 调用 getData 方法时使用这些安全检查后的值
     getData({
         page: currentPage.value,
         pageSize: pageSize.value,
         name: name.value,
         description: description.value,
         status: status.value,
-        blocked: block.value
-    })
-}
-//删除
+        blocked: block.value,
+        beginTime: beginTime,
+        endTime: endTime,
+    });
+
+    // 打印 value1.value 进行调试
+    console.log(value1.value);
+};
+
+
 const goDelete = () => {
     const ids = multipleSelection.value.map(record => record.id);
-    console.log(ids);
-
-    // 拼接URL参数
     const queryString = ids.map(id => `ids=${id}`).join('&');
     const url = `https://city.cybercodefarmer.group/api/trafficInfo?${queryString}`;
 
-    axios({
-        url: url,
-        method: 'DELETE',
-    }).then((res) => {
-        if (res.data.code === 1) {
-            openSuccess('删除成功！');
-            getData({
-                page: currentPage.value,
-                pageSize: pageSize.value,
-                name: name.value,
-                description: description.value,
-                status: status.value,
-                blocked: block.value
-            })
-        } else {
-            openError('删除失败！');
-        }
-    }).catch((error) => {
-        openError(error.response.status);
-    });
-};
-const myDelete = () => {
-    if (multipleSelection.value.length == 0) {
-        openWarning('请检查是否选择了删除内容')
-        return
-    }
-    goDelete()
-    // openSuccess('删除成功')
-}
-//选择日期
-const value1 = ref()
-//格式化日期
-function formatDate(date?: Date): string {
-    if (!date) return ''; // 如果 date 是 undefined 或 null，返回空字符串
-
-    const pad = (n: number): string => n < 10 ? '0' + n : n.toString();
-
-    const year = date.getFullYear();
-    const month = pad(date.getMonth() + 1); // 月份从0开始，所以要加1
-    const day = pad(date.getDate());
-
-    const hours = pad(date.getHours());
-    const minutes = pad(date.getMinutes());
-    const seconds = pad(date.getSeconds());
-
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-}
-//islog
-const isLog = ref(store.isLog)
-const open = () => {
-    ElMessageBox.prompt('请输入密钥', '管理员确认', {
-        confirmButtonText: '确认',
-        cancelButtonText: '退出'
-    })
-        .then(({ value }) => {
-            if (value == 'lstlst') {
-                ElMessage({
-                    type: 'success',
-                    message: `密码正确`,
-                })
-                isLog.value = true
-                store.isLog = true
+    axios.delete(url)
+        .then(res => {
+            if (res.data.code === 1) {
+                openSuccess('删除成功！');
+                search();
             } else {
-                ElMessage({
-                    type: 'error',
-                    message: `密码错误`,
-                })
+                openError('删除失败！');
             }
         })
-}
+        .catch(error => {
+            openError(error.response.status);
+        });
+};
+
+const myDelete = () => {
+    if (multipleSelection.value.length == 0) {
+        openWarning('请检查是否选择了删除内容');
+        return;
+    }
+    goDelete();
+};
+
+
+onMounted(() => {
+    search();
+});
 </script>
+
 
 <template>
     <div>
@@ -464,8 +240,8 @@ const open = () => {
                     <span class="label">时间范围:</span>
                     <div class="block">
                         <el-date-picker v-model="value1" type="datetimerange" range-separator="To"
-                            start-placeholder="Start date" end-placeholder="End date" size="large"
-                            style="width:180px" />
+                            start-placeholder="Start date" end-placeholder="End date" size="large" format="YYYY/MM/DD"
+                            value-format="YYYY-MM-DD hh:mm:ss" style="width:180px" />
                     </div>
                 </div>
                 <el-button type="primary" :icon="Search" class="bt" @click="search">查询</el-button>
