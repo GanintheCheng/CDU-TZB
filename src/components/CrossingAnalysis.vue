@@ -54,7 +54,10 @@ echarts.use([
     CanvasRenderer
 ]);
 
-const option1: ECOption = {
+const dateArray = ref(['2024-07-01', '2024-07-02', '2024-07-03', '2024-07-04', '2024-07-05', '2024-07-06', '2024-07-07'])
+const status = ref('')
+
+const option1 = ref({
     title: {
         text: '路口图'
     },
@@ -92,15 +95,7 @@ const option1: ECOption = {
     xAxis: {
         type: 'category',
         boundaryGap: false,
-        data: [
-            '2024-07-01',
-            '2024-07-02',
-            '2024-07-03',
-            '2024-07-04',
-            '2024-07-05',
-            '2024-07-06',
-            '2024-07-07'
-        ]
+        data: dateArray.value
     },
     yAxis: {
         type: 'value',
@@ -130,7 +125,7 @@ const option1: ECOption = {
             data: [1.08, 2.18, 1.4, 0.46, 1.25, 2.88, 1.99, 1.42]
         }
     ]
-};
+});
 
 const option2: ECOption = {
     title: {
@@ -178,9 +173,9 @@ const option2: ECOption = {
     ]
 };
 
-import { ref, onMounted, watchEffect } from "vue";
+import { ref, onMounted, watchEffect, watch } from "vue";
 import { useRoute } from 'vue-router';
-const date = ref();
+const date = ref(['2024-07-01', '2024-07-07']);
 const chartRef1 = ref(null);
 const chartRef2 = ref(null);
 
@@ -206,9 +201,9 @@ const getAva = async () => {
     try {
         const response = await axios({
             method: 'GET',
-            url: `https://city.cybercodefarmer.group/api/report/crossing?beginDate=2024-06-01&endDate=2024-06-30&crossingId=${id.value}`,
+            url: `https://city.cybercodefarmer.group/api/report/crossing?beginDate=${date.value[0]}&endDate=${date.value[1]}&crossingId=${id.value}`,
         });
-        option1.series = response.data.data;
+        option1.value.series = response.data.data;
         console.log(response.data.data);
         return response.data; // 返回数据，以便在需要时使用
     } catch (error) {
@@ -219,12 +214,21 @@ const getAva = async () => {
 
 const getRoad = async () => {
     try {
+        // 确保 status 参数的正确处理
+        const statusValue = status.value == '' || status.value == undefined || status.value == null ? 1 : status.value;
+
         const response = await axios({
             method: 'GET',
-            url: `https://city.cybercodefarmer.group/api/report/road?crossing_id=${id.value}&status=1`,
+            url: `https://city.cybercodefarmer.group/api/report/road`,
+            params: {
+                crossing_id: id.value,
+                status: statusValue
+            }
         });
+
+        // 处理返回的数据
         option2.series[0].data = response.data.data.countList;
-        option2.xAxis.data = response.data.data.nameList
+        option2.xAxis.data = response.data.data.nameList;
         console.log(response.data.data);
         console.log(option2);
 
@@ -235,13 +239,14 @@ const getRoad = async () => {
     }
 };
 
-onMounted(async () => {
+
+const getData = async () => {
     try {
         await getAva();
         await getRoad();
         if (chartRef1.value) {
             const chartInstance1 = echarts.init(chartRef1.value);
-            chartInstance1.setOption(option1);
+            chartInstance1.setOption(option1.value);
         }
 
         if (chartRef2.value) {
@@ -253,11 +258,17 @@ onMounted(async () => {
         console.error('Error in onMounted:', error);
         // 这里可以添加错误处理逻辑，比如显示一个错误消息给用户
     }
+}
+onMounted(async () => {
+    getData()
 });
 
 
 const predict = ref('')
 const analysis = ref('')
+const reason = ref('')
+const suggest = ref('')
+const nowTime = ref('')
 const getPrediction = () => {
     axios({
         method: 'GET',
@@ -274,19 +285,69 @@ const getAnalysis = () => {
         method: 'GET',
         url: 'https://city.cybercodefarmer.group/api/crossing/history/' + id.value,
     }).then(res => {
-        analysis.value = res.data.data
+        if (res.data.code == 1) {
+            analysis.value = res.data.data.timeAnalyse
+            reason.value = res.data.data.reasonAnalyse
+            suggest.value = res.data.data.suggestion
+            nowTime.value = res.data.data.lastUpdateTime
+        }
+        else {
+            analysis.value = '暂无数据'
+        }
         // console.log(res.data.data);
     }).catch(() => {
 
     })
 }
+watch(date, (newDate, oldDate) => {
+    console.log('date 发生了变化:');
+    loading.value = !loading.value;
+    dateArray.value = getDatesInRange();
+    option1.value.xAxis.data = dateArray.value;  // 确保 xAxis 数据被更新
+    getData();
+});
+
+watch(status, (newDate) => {
+    loading.value = !loading.value;
+    getData()
+})
+
+const getDatesInRange = () => {
+    const startDate = date.value[0]
+    const endDate = date.value[1]
+    const dateArray = [];
+    let currentDate = new Date(startDate);
+
+    while (currentDate <= new Date(endDate)) {
+        dateArray.push(currentDate.toISOString().split('T')[0]);
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+    return dateArray;
+}
 getPrediction()
 getAnalysis()
+const options = [
+    {
+        value: '1',
+        label: '畅通',
+    },
+    {
+        value: '2',
+        label: '缓行',
+    },
+    {
+        value: '3',
+        label: '拥堵',
+    },
+    {
+        value: '4',
+        label: '严重拥堵',
+    },
+]
 </script>
 
 <template>
     <div class="box" v-loading="loading" v-if="id != undefined || ''">
-        {{ date }}
         <div class="top">
             <div class="topleft">
                 <div class="info">
@@ -302,6 +363,10 @@ getAnalysis()
             <div class="topright">
                 <div class="info">
                     <div class="name">{{ name }}</div>
+                    <el-select placeholder="状态选择(默认畅通)" style="width: 240px" v-model="status">
+                        <el-option v-for="item in options" :key="item.value" :label="'状态:' + item.label"
+                            :value="item.value" />
+                    </el-select>
                 </div>
                 <div class="pic" ref="chartRef2" style="height: 100%;"></div>
             </div>
@@ -309,7 +374,7 @@ getAnalysis()
         <div class="bt">
             <div class="btbox">
                 <div class="name">
-                    功能菜单
+                    功能菜单 | 截止时间{{ nowTime }}
                 </div>
                 <el-tabs type="border-card">
                     <el-tab-pane label="数据分析" class="info">
@@ -317,6 +382,12 @@ getAnalysis()
                     </el-tab-pane>
                     <el-tab-pane label="未来预测" class="info">
                         <div v-html="predict"></div>
+                    </el-tab-pane>
+                    <el-tab-pane label="原因" class="info">
+                        <div v-html="reason"></div>
+                    </el-tab-pane>
+                    <el-tab-pane label="建议" class="info">
+                        <div v-html="suggest"></div>
                     </el-tab-pane>
                 </el-tabs>
             </div>

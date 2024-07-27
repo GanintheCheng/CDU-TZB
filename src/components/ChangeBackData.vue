@@ -13,6 +13,8 @@ const name = ref('')
 const location = ref('')
 const forbidden = ref('')
 const level = ref('')
+const region = ref('')
+const cityCode = ref('')
 //弹窗
 const openError1 = () => {
     ElMessage({
@@ -32,7 +34,7 @@ const openError2 = (status: String) => {
 //提交逻辑
 const commit = () => {
     //检查是否输入
-    if (name.value == '' || location.value == '' || level.value == '' || forbidden.value == '') {
+    if (name.value == '' || location.value == '' || level.value == '' || forbidden.value == '' || cityCode.value == '' || region.value == '') {
         openError1()
         return
     }
@@ -43,7 +45,9 @@ const commit = () => {
             name: name.value,
             position: location.value,
             level: level.value,
-            forbidden: forbidden.value
+            forbidden: forbidden.value,
+            region: region.value,
+            cityCode: cityCode.value
         }
     }).then(res => {
         if (res.data.code == 1) {
@@ -85,6 +89,12 @@ const notComfirm = () => {
             </el-form-item>
             <el-form-item label="location">
                 <el-input placeholder="经纬坐标" v-model="location" />
+            </el-form-item>
+            <el-form-item label="region">
+                <el-input placeholder="区域" v-model="region" />
+            </el-form-item>
+            <el-form-item label="cityCode">
+                <el-input placeholder="城市编码" v-model="cityCode" />
             </el-form-item>
             <el-form-item label="level">
                 <el-select v-model="level" placeholder="道路等级" clearable>

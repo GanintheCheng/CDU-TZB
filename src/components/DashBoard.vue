@@ -101,7 +101,8 @@ onBeforeMount(() => {
                 <el-col :span="6">
                     <div class="grid-content ep-bg-purple">
                         <div class="title">
-                            路况值平均值<span style="font-size: 10px;"></span>
+                            路况值平均值
+                            <span style="font-size: 10px;">(路况0:未知,1:畅通,2:缓慢,3:拥堵)</span>
                         </div>
 
                         <div class="content">

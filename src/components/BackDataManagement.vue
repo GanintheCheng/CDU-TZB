@@ -489,6 +489,7 @@ const open = () => {
                 <el-table-column property="blocked" label="拥堵比" width="80" show-overflow-tooltip />
                 <el-table-column property="unknown" label="未知路段比" width="80" show-overflow-tooltip />
                 <el-table-column property="status" label="路况" width="80" show-overflow-tooltip />
+                <el-table-column property="weather" label="天气" width="160" show-overflow-tooltip />
                 <el-table-column property="createTime" label="创建时间" width="160" show-overflow-tooltip />
                 <el-table-column property="description" label="路况描述" show-overflow-tooltip />
                 <!-- <el-table-column property="crossingId" label="CrossingId" width="80" show-overflow-tooltip /> -->

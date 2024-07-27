@@ -20,7 +20,7 @@
                             曾宇
                         </div>
                     </el-collapse-item>
-                    <el-collapse-item title="项目学生组长" name="3">
+                    <el-collapse-item title="项目学生组长" name="2">
                         <div>
                             软件工程 - 李函
                         </div>
