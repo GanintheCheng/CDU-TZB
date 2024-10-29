@@ -54,7 +54,7 @@ const handleEdit = (index: number, row: User) => {
     let nowForbidden = store.backData[index].forbidden
     axios({
         method: 'put',
-        url: 'https://city.cybercodefarmer.group/api/crossing',
+        url: 'http://47.108.190.192:8090/api/crossing',
         data: {
             id: row.id,
             forbidden: nowForbidden
@@ -73,7 +73,7 @@ const handleEdit = (index: number, row: User) => {
 const handleDelete = (index: number, row: User) => {
     axios({
         method: 'DELETE',
-        url: `https://city.cybercodefarmer.group/api/crossing/${row.id}`
+        url: `http://47.108.190.192:8090/api/crossing/${row.id}`
     }).then(res => {
         if (res.data.code == 1) {
             getData()
@@ -88,7 +88,7 @@ const getData = () => {
     loading.value = true
     axios({
         method: 'get',
-        url: 'https://city.cybercodefarmer.group/api/crossing'
+        url: 'http://47.108.190.192:8090/api/crossing'
     }).then(res => {
         store.backData = res.data.data
         tableData.value = res.data.data
@@ -134,7 +134,7 @@ const open = () => {
 </script>
 
 <template>
-    <div style="max-width: 1200px;" v-if="isLog">
+    <div style="max-width: 1200px;">
         参数一览:<el-button type="primary" @click="change" style="float: right;">增加</el-button><br /><br />
         <el-table ref="singleTableRef" :data="tableData" highlight-current-row style="width: 100%"
             @current-change="handleCurrentChange" v-loading="loading">
@@ -147,14 +147,17 @@ const open = () => {
             <el-table-column label="点击切换状态">
                 <template #default="scope">
                     <el-button size="small" @click="handleEdit(scope.$index, scope.row)" type="danger"
-                        v-if="scope.row.forbidden == 0">
+                        v-if="scope.row.forbidden == 0 && isLog">
                         当前禁用
                     </el-button>
-                    <el-button size="small" @click="handleEdit(scope.$index, scope.row)" type="primary" v-else>
+                    <el-button size="small" @click="handleEdit(scope.$index, scope.row)" type="primary" v-if="isLog">
                         当前启用
                     </el-button>
-                    <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">
+                    <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)" v-if="isLog">
                         删除
+                    </el-button>
+                    <el-button size="small" @click="open()" type="primary" v-if="!isLog">
+                        登录
                     </el-button>
                     <!-- @click="router.push(`/crossinganalysis?id=${scope.row.id}`)" -->
                     <el-button size="small" type="success" :info="scope.row" @click="router.push(`/crossinganalysis?id=${scope.row.id}&&name=${scope.row.name}`)">
@@ -164,11 +167,7 @@ const open = () => {
             </el-table-column>
         </el-table>
     </div>
-    <div v-else>
-        <el-empty description="未登录管理员 无法访问该页面">
-            <el-button type="primary" @click="open()">输入密钥</el-button>
-        </el-empty>
-    </div>
+
 </template>
 
 <style scoped></style>

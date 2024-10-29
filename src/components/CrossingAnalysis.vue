@@ -82,7 +82,7 @@ const option1 = ref({
         data: ['畅通比', '缓行比', '拥堵比']
     },
     grid: {
-        left: '3%',
+        left: '0%',
         right: '4%',
         bottom: '3%',
         containLabel: true
@@ -94,38 +94,40 @@ const option1 = ref({
     },
     xAxis: {
         type: 'category',
-        boundaryGap: false,
+        boundaryGap: true, // 确保柱状图不贴近左侧
         data: dateArray.value
     },
     yAxis: {
         type: 'value',
-        max: 100,
+        max: 10,
         min: 0,
         axisLabel: {
             formatter: '{value}%'
         }
     },
     series: [
-        {
-            name: '畅通比',
-            type: 'line',
-            color: 'green',
-            data: [83.99, 79.88, 80.68, 83.97, 80.81, 77.04, 79.12, 80.16]
-        },
+        // {
+        //     name: '畅通比',
+        //     type: 'bar',
+        //     color: 'green',
+        //     data: [83.99, 79.88, 80.68, 83.97, 80.81, 77.04, 79.12, 80.16]
+        // },
         {
             name: '缓行比',
-            type: 'line',
+            type: 'bar',
             color: '#baa381',
             data: [6.09, 8.43, 6.81, 2.95, 5.75, 8.26, 6.83, 6.22]
         },
         {
             name: '拥堵比',
-            type: 'line',
+            type: 'bar',
             color: 'red',
             data: [1.08, 2.18, 1.4, 0.46, 1.25, 2.88, 1.99, 1.42]
         }
     ]
 });
+
+
 
 const option2: ECOption = {
     title: {
@@ -168,7 +170,7 @@ const option2: ECOption = {
     series: [
         {
             data: [150, 230, 224, 218, 135, 147, 260],
-            type: 'line'
+            type: 'bar'
         }
     ]
 };
@@ -201,10 +203,22 @@ const getAva = async () => {
     try {
         const response = await axios({
             method: 'GET',
-            url: `https://city.cybercodefarmer.group/api/report/crossing?beginDate=${date.value[0]}&endDate=${date.value[1]}&crossingId=${id.value}`,
+            url: `http://47.108.190.192:8090/api/report/crossing?beginDate=${date.value[0]}&endDate=${date.value[1]}&crossingId=${id.value}`,
         });
-        option1.value.series = response.data.data;
+        response.data.data[0].type = 'bar'
+        response.data.data[1].type = 'bar'
+        response.data.data[2].type = 'bar'
+        option1.value.series[0] = response.data.data[1];
+        option1.value.series[1] = response.data.data[2];
+        for(let i =0 ; i<option1.value.series[0].data.length ; i++){
+            if(option1.value.series[0].data[i]>10||option1.value.series[1].data[i]>10){
+                option1.value.yAxis.max=20
+                break
+            }
+            option1.value.yAxis.max=10
+        }
         console.log(response.data.data);
+        if(response.data.data[1])
         return response.data; // 返回数据，以便在需要时使用
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -219,7 +233,7 @@ const getRoad = async () => {
 
         const response = await axios({
             method: 'GET',
-            url: `https://city.cybercodefarmer.group/api/report/road`,
+            url: `http://47.108.190.192:8090/api/report/road`,
             params: {
                 crossing_id: id.value,
                 status: statusValue
@@ -263,7 +277,6 @@ onMounted(async () => {
     getData()
 });
 
-
 const predict = ref('')
 const analysis = ref('')
 const reason = ref('')
@@ -272,7 +285,7 @@ const nowTime = ref('')
 const getPrediction = () => {
     axios({
         method: 'GET',
-        url: 'https://city.cybercodefarmer.group/api/crossing/predict/' + id.value,
+        url: 'http://47.108.190.192:8090/api/crossing/predict/' + id.value,
     }).then(res => {
         predict.value = res.data.data
         // console.log(res.data.data);
@@ -283,7 +296,7 @@ const getPrediction = () => {
 const getAnalysis = () => {
     axios({
         method: 'GET',
-        url: 'https://city.cybercodefarmer.group/api/crossing/history/' + id.value,
+        url: 'http://47.108.190.192:8090/api/crossing/history/' + id.value,
     }).then(res => {
         if (res.data.code == 1) {
             analysis.value = res.data.data.timeAnalyse
@@ -355,7 +368,7 @@ const options = [
                     <div class="date">
                         <el-date-picker v-model="date" type="daterange" start-placeholder="起始" end-placeholder="终点"
                             format="YYYY/MM/DD" value-format="YYYY-MM-DD"
-                            :default-value="[new Date(2024, 7, 1), new Date(2024, 7, 7)]" style="width: 100px;" />
+                            :default-value="[new Date(2024, 7, 1), new Date(2024, 7, 7)]" style="width: 220px;" />
                     </div>
                 </div>
                 <div class="pic" ref="chartRef1" style="height: 100%;"></div>
@@ -374,20 +387,21 @@ const options = [
         <div class="bt">
             <div class="btbox">
                 <div class="name">
-                    功能菜单 | 截止时间{{ nowTime }}
+                    功能菜单 | 分析数据截止时间{{ nowTime }}
                 </div>
                 <el-tabs type="border-card">
                     <el-tab-pane label="数据分析" class="info">
-                        <div v-html="analysis"></div>
+                        <div v-html="analysis" style="line-height: 1.6; text-indent: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); color: #333;"></div>
+
                     </el-tab-pane>
                     <el-tab-pane label="未来预测" class="info">
-                        <div v-html="predict"></div>
+                        <div v-html="predict" style="line-height: 1.6; text-indent: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); color: #333;"></div>
                     </el-tab-pane>
                     <el-tab-pane label="原因" class="info">
-                        <div v-html="reason"></div>
+                        <div v-html="reason" style="line-height: 1.6; text-indent: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); color: #333;"></div>
                     </el-tab-pane>
                     <el-tab-pane label="建议" class="info">
-                        <div v-html="suggest"></div>
+                        <div v-html="suggest" style="line-height: 1.6; text-indent: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); color: #333;"></div>
                     </el-tab-pane>
                 </el-tabs>
             </div>
@@ -411,7 +425,7 @@ const options = [
     display: flex;
     justify-content: space-between;
     flex: 0.4;
-    min-height: 300px;
+    min-height: 500px;
     margin-bottom: 10px;
 
     .topleft,

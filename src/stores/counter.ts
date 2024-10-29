@@ -1,5 +1,9 @@
 import { ref, computed } from "vue";
-import { defineStore } from "pinia";
+import { createPinia, defineStore } from "pinia";
+// import { createPersistedState } from 'pinia-plugin-persistedstate';
+
+// const pinia = createPinia();
+// pinia.use(createPersistedState());
 
 export const useCounterStore = defineStore(
   "counter",
@@ -86,7 +90,8 @@ export const useCounterStore = defineStore(
     const TopName = "控制台";
     const isInput = false;
     const isLog = false;
-    return { count, doubleCount, increment, TopName, backData, isInput, isLog };
+    const num = ref(200)
+    return { count, doubleCount, increment, TopName, backData, isInput, isLog,num };
   },
 
   {

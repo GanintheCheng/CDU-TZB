@@ -40,7 +40,7 @@ const commit = () => {
     }
     axios({
         method: 'POST',
-        url: 'https://city.cybercodefarmer.group/api/crossing',
+        url: 'http://47.108.190.192:8090/api/crossing',
         params: {
             name: name.value,
             position: location.value,

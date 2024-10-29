@@ -7,6 +7,7 @@ import MyFooter from './components/MyFooter.vue'
 import { ElDrawer } from 'element-plus'
 
 const store = useCounterStore()
+store.num = store.num +1
 const isDrawerVisible = ref(false)
 
 import { watch } from 'vue'

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { Method, AxiosRequestConfig } from 'axios';
 
-const baseUrl = 'https://city.cybercodefarmer.group/api';
+const baseUrl = 'http://47.108.190.192:8090/api';
 
 const MyAxios = async (
     address: string,

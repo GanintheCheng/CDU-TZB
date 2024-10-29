@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import axios from 'axios';
 import MapContainner from '@/components/map/MapContainer.vue'
-import { onBeforeMount, ref } from 'vue';
+import { ElMessage, ElMessageBox, ElNotification, ElTable } from 'element-plus';
+import { onBeforeMount, ref, watch } from 'vue';
 const date = ref(new Date())
 
 const Expedite = ref()
@@ -10,23 +11,23 @@ const Blocked = ref()
 const Status = ref()
 const loading = ref(true)
 
-const formatDate = (date:any) => {
-  return date.toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  }).replace(/\//g, '-');
+const formatDate = (date: any) => {
+    return date.toLocaleDateString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).replace(/\//g, '-');
 };
 
 const getData = () => {
     axios(({
-        url: 'https://city.cybercodefarmer.group/api/trafficInfo/average',
+        url: 'http://47.108.190.192:8090/api/trafficInfo/average',
         method: 'GET',
         params: {
-            beginDate: '2024-05-27',
-            endDate: formatDate(date.value),
-            beginTime:'11',
-            endTime:'18'
+            beginDate: choiceDate.value[0],
+            endDate: choiceDate.value[1],
+            beginTime: '11',
+            endTime: '18'
         }
     })).then(res => {
         // for (let i = 0, len = records.length; i < len; i++) {
@@ -46,6 +47,11 @@ const getData = () => {
         Congested.value = res.data.data.congestedAvg;
         Blocked.value = res.data.data.blockedAvg;
         Status.value = res.data.data.statusAvg;
+        ElNotification({
+        title: 'Success',
+        message: '加载成功',
+        type: 'success',
+    });
     }).catch(error => {
         console.log(error);
         console.log(12312312312312312);
@@ -57,7 +63,44 @@ onBeforeMount(() => {
     getData()
 })
 
-
+//快捷选择
+const shortcuts = [
+    {
+        text: 'Last week',
+        value: () => {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
+            return [start, end]
+        },
+    },
+    {
+        text: 'Last month',
+        value: () => {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
+            return [start, end]
+        },
+    },
+    {
+        text: 'Last 3 months',
+        value: () => {
+            const end = new Date()
+            const start = new Date()
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
+            return [start, end]
+        },
+    },
+]
+const choiceDate = ref([
+    '2024-05-27',
+    formatDate(date.value)
+])
+watch(choiceDate, () => {
+    loading.value = true
+    getData()
+})
 </script>
 
 <template>
@@ -65,7 +108,10 @@ onBeforeMount(() => {
         <div class="box" v-loading="loading">
             <div style="margin-bottom: 20px;font-size: 20px;">
                 城市拥堵情况平均值
-                <span style="font-size: small;">{{ date.getMonth() + 1 }}月{{ date.getDate() }}日</span>
+                <!-- <span style="font-size: small;">{{ date.getMonth() + 1 }}月{{ date.getDate() }}日</span> -->
+                <el-date-picker v-model="choiceDate" type="daterange" unlink-panels range-separator="To"
+                    start-placeholder="Start date" end-placeholder="End date" :shortcuts="shortcuts"
+                    value-format="YYYY-MM-DD" />
             </div>
             <el-row :gutter="20">
                 <el-col :span="6">
@@ -102,7 +148,7 @@ onBeforeMount(() => {
                     <div class="grid-content ep-bg-purple">
                         <div class="title">
                             路况值平均值
-                            <span style="font-size: 10px;">(路况0:未知,1:畅通,2:缓慢,3:拥堵)</span>
+                            <span style="font-size: 10px;" class="phone">(路况0:未知,1:畅通,2:缓慢,3:拥堵)</span>
                         </div>
 
                         <div class="content">
@@ -167,5 +213,11 @@ onBeforeMount(() => {
 .content {
     font-size: 18px;
     font-weight: 900;
+}
+
+@media only screen and (max-width: 768px) {
+    .phone {
+        display: none;
+    }
 }
 </style>

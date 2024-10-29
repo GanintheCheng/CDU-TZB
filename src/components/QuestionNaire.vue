@@ -224,7 +224,7 @@ const commit = () => {
     console.log(JSON.stringify(answers));
     axios({
         method: 'POST',
-        url: 'https://city.cybercodefarmer.group/api/survey',
+        url: 'http://47.108.190.192:8090/api/survey',
         data: JSON.stringify(answers), // 直接传递字符串格式的数组
         headers: {
             'Content-Type': 'application/json'

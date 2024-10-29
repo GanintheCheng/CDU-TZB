@@ -1,5 +1,29 @@
 <script setup lang="ts">
 import { Edit, View as IconView } from '@element-plus/icons-vue'
+import { useCounterStore } from '@/stores/counter'
+import { ref } from 'vue';
+import axios from 'axios';
+//store定义
+const store = useCounterStore()
+const num = ref(store.num)
+const date = ref(new Date())
+const formatDate = (date: any) => {
+    return date.toLocaleDateString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).replace(/\//g, '-');
+};
+
+const getTodayData = () => {
+    axios({
+        url: 'http://47.108.190.192:8090/api/visits'
+    }).then((data) => {
+        todayData.value = data.data.data
+    })
+}
+const todayData = ref('200')
+getTodayData()
 </script>
 
 <template>
@@ -9,6 +33,8 @@ import { Edit, View as IconView } from '@element-plus/icons-vue'
             <div class="text">城市交通病治理管理平台</div>
         </div>
         <div class="right">
+            <span style="margin-right: 20px;" class="none">{{ formatDate(date) }}</span>
+            <span style="margin-right: 20px;" class="none">今日访问量:{{ todayData }}</span>
             <el-link type="danger" target="_blank" href="https://computer.cdu.edu.cn/" :icon="Edit">友情连接</el-link>
         </div>
     </div>
@@ -57,6 +83,13 @@ import { Edit, View as IconView } from '@element-plus/icons-vue'
 
     .right {
         background-color: #a0cfff;
+        text-wrap: nowrap;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .none {
+        display: none;
     }
 }
 </style>

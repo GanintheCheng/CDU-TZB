@@ -114,6 +114,7 @@ interface RequestParams {
     status?: string;
     blocked?: boolean;
     beginTime?: string;
+    endTime?: string;
 }
 
 const getData = (params: RequestParams) => {
@@ -141,8 +142,11 @@ const getData = (params: RequestParams) => {
     if (params.beginTime !== undefined) {
         queryParams.beginTime = params.beginTime;
     }
+    if (params.endTime !== undefined) {
+        queryParams.endTime = params.endTime;
+    }
 
-    axios.get('https://city.cybercodefarmer.group/api/trafficInfo/trafficInfoPage', { params: queryParams })
+    axios.get('http://47.108.190.192:8090/api/trafficInfo/trafficInfoPage', { params: queryParams })
         .then(res => {
             tableData.value = res.data.data.records as records[];
             total.value = res.data.data.total;
@@ -181,7 +185,7 @@ const search = () => {
 const goDelete = () => {
     const ids = multipleSelection.value.map(record => record.id);
     const queryString = ids.map(id => `ids=${id}`).join('&');
-    const url = `https://city.cybercodefarmer.group/api/trafficInfo?${queryString}`;
+    const url = `http://47.108.190.192:8090/api/trafficInfo?${queryString}`;
 
     axios.delete(url)
         .then(res => {
@@ -209,6 +213,28 @@ const myDelete = () => {
 onMounted(() => {
     search();
 });
+
+const open = () => {
+    ElMessageBox.prompt('请输入密钥', '管理员确认', {
+        confirmButtonText: '确认',
+        cancelButtonText: '退出'
+    })
+        .then(({ value }) => {
+            if (value == 'lstlst') {
+                ElMessage({
+                    type: 'success',
+                    message: `密码正确`,
+                })
+                isLog.value = true
+                store.isLog = true
+            } else {
+                ElMessage({
+                    type: 'error',
+                    message: `密码错误`,
+                })
+            }
+        })
+}
 </script>
 
 
@@ -241,7 +267,7 @@ onMounted(() => {
                     <div class="block">
                         <el-date-picker v-model="value1" type="datetimerange" range-separator="To"
                             start-placeholder="Start date" end-placeholder="End date" size="large" format="YYYY/MM/DD"
-                            value-format="YYYY-MM-DD hh:mm:ss" style="width:180px" />
+                            value-format="YYYY-MM-DD hh:mm:ss" style="width:210px" />
                     </div>
                 </div>
                 <el-button type="primary" :icon="Search" class="bt" @click="search">查询</el-button>

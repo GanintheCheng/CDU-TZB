@@ -47,6 +47,7 @@ declare module 'vue' {
     ElResult: typeof import('element-plus/es')['ElResult']
     ElRow: typeof import('element-plus/es')['ElRow']
     ElSelect: typeof import('element-plus/es')['ElSelect']
+    ElSkeleton: typeof import('element-plus/es')['ElSkeleton']
     ElStatistic: typeof import('element-plus/es')['ElStatistic']
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
     ElTable: typeof import('element-plus/es')['ElTable']
@@ -62,6 +63,7 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ShowResult: typeof import('./src/components/ShowResult.vue')['default']
+    SurveyResults: typeof import('./src/components/SurveyResults.vue')['default']
     TopView: typeof import('./src/components/TopView.vue')['default']
   }
   export interface ComponentCustomProperties {
