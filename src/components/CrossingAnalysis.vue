@@ -106,12 +106,6 @@ const option1 = ref({
         }
     },
     series: [
-        // {
-        //     name: '畅通比',
-        //     type: 'bar',
-        //     color: 'green',
-        //     data: [83.99, 79.88, 80.68, 83.97, 80.81, 77.04, 79.12, 80.16]
-        // },
         {
             name: '缓行比',
             type: 'bar',
@@ -208,18 +202,20 @@ const getAva = async () => {
         response.data.data[0].type = 'bar'
         response.data.data[1].type = 'bar'
         response.data.data[2].type = 'bar'
+        console.log(response.data);
+
         option1.value.series[0] = response.data.data[1];
         option1.value.series[1] = response.data.data[2];
-        for(let i =0 ; i<option1.value.series[0].data.length ; i++){
-            if(option1.value.series[0].data[i]>10||option1.value.series[1].data[i]>10){
-                option1.value.yAxis.max=20
+        for (let i = 0; i < option1.value.series[0].data.length; i++) {
+            if (option1.value.series[0].data[i] > 10 || option1.value.series[1].data[i] > 10) {
+                option1.value.yAxis.max = 20
                 break
             }
-            option1.value.yAxis.max=10
+            option1.value.yAxis.max = 10
         }
         console.log(response.data.data);
-        if(response.data.data[1])
-        return response.data; // 返回数据，以便在需要时使用
+        if (response.data.data[1])
+            return response.data; // 返回数据，以便在需要时使用
     } catch (error) {
         console.error('Error fetching data:', error);
         throw error; // 重新抛出错误，以便在调用处处理
@@ -252,7 +248,6 @@ const getRoad = async () => {
         throw error; // 重新抛出错误，以便在调用处处理
     }
 };
-
 
 const getData = async () => {
     try {
@@ -360,56 +355,79 @@ const options = [
 </script>
 
 <template>
-    <div class="box" v-loading="loading" v-if="id != undefined || ''">
-        <div class="top">
-            <div class="topleft">
-                <div class="info">
-                    <div class="name">{{ name }}</div>
-                    <div class="date">
-                        <el-date-picker v-model="date" type="daterange" start-placeholder="起始" end-placeholder="终点"
-                            format="YYYY/MM/DD" value-format="YYYY-MM-DD"
-                            :default-value="[new Date(2024, 7, 1), new Date(2024, 7, 7)]" style="width: 220px;" />
+    <div style="height: 100%; width: 100%; display: flex; justify-content: center;">
+        <dv-border-box-11 title="可视化中控大屏" style="width: 100%; height: 100%; position: relative;">
+            <div style="position: relative; height: 100%; padding: 60px 20px 20px 20px;">
+                <div class="box" v-loading="loading" v-if="id != undefined || ''">
+                    <div class="top">
+                        <div class="topleft">
+                            <dv-border-box10>
+                                <div class="info">
+                                    <div class="name">{{ name }}</div>
+                                    <div class="date">
+                                        <el-date-picker v-model="date" type="daterange" start-placeholder="起始"
+                                            end-placeholder="终点" format="YYYY/MM/DD" value-format="YYYY-MM-DD"
+                                            :default-value="[new Date(2024, 7, 1), new Date(2024, 7, 7)]"
+                                            style="width: 220px;" />
+                                    </div>
+                                </div>
+                                <div class="pic" ref="chartRef1" style="height: 100%;"></div>
+                            </dv-border-box10>
+
+                        </div>
+                        <div class="topright">
+                            <dv-border-box10>
+                                <div class="info">
+                                    <div class="name">{{ name }}</div>
+                                    <el-select placeholder="状态选择(默认畅通)" style="width: 240px" v-model="status">
+                                        <el-option v-for="item in options" :key="item.value" :label="'状态:' + item.label"
+                                            :value="item.value" />
+                                    </el-select>
+                                </div>
+                                <div class="pic" ref="chartRef2" style="height: 100%;"></div>
+                            </dv-border-box10>
+                        </div>
+                    </div>
+                    <dv-border-box12>
+
+                    </dv-border-box12>
+                    <div class="bt">
+                        <div class="btbox">
+                            <div class="name">
+                                功能菜单 | 分析数据截止时间{{ nowTime }}
+                            </div>
+                            <el-tabs type="border-card">
+                                <el-tab-pane label="数据分析" class="info">
+                                    <div v-html="analysis"
+                                        style="line-height: 1.6; text-indent: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); color: #333;">
+                                    </div>
+
+                                </el-tab-pane>
+                                <el-tab-pane label="未来预测" class="info">
+                                    <div v-html="predict"
+                                        style="line-height: 1.6; text-indent: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); color: #333;">
+                                    </div>
+                                </el-tab-pane>
+                                <el-tab-pane label="原因" class="info">
+                                    <div v-html="reason"
+                                        style="line-height: 1.6; text-indent: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); color: #333;">
+                                    </div>
+                                </el-tab-pane>
+                                <el-tab-pane label="建议" class="info">
+                                    <div v-html="suggest"
+                                        style="line-height: 1.6; text-indent: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); color: #333;">
+                                    </div>
+                                </el-tab-pane>
+                            </el-tabs>
+                        </div>
                     </div>
                 </div>
-                <div class="pic" ref="chartRef1" style="height: 100%;"></div>
+                <div v-else><el-empty description="请在后台数据参数设置界面进行道路选择">
+                        <el-button type="primary" @click="router.push(`/backdata`)">点击跳转</el-button>
+                    </el-empty></div>
             </div>
-            <div class="topright">
-                <div class="info">
-                    <div class="name">{{ name }}</div>
-                    <el-select placeholder="状态选择(默认畅通)" style="width: 240px" v-model="status">
-                        <el-option v-for="item in options" :key="item.value" :label="'状态:' + item.label"
-                            :value="item.value" />
-                    </el-select>
-                </div>
-                <div class="pic" ref="chartRef2" style="height: 100%;"></div>
-            </div>
-        </div>
-        <div class="bt">
-            <div class="btbox">
-                <div class="name">
-                    功能菜单 | 分析数据截止时间{{ nowTime }}
-                </div>
-                <el-tabs type="border-card">
-                    <el-tab-pane label="数据分析" class="info">
-                        <div v-html="analysis" style="line-height: 1.6; text-indent: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); color: #333;"></div>
-
-                    </el-tab-pane>
-                    <el-tab-pane label="未来预测" class="info">
-                        <div v-html="predict" style="line-height: 1.6; text-indent: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); color: #333;"></div>
-                    </el-tab-pane>
-                    <el-tab-pane label="原因" class="info">
-                        <div v-html="reason" style="line-height: 1.6; text-indent: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); color: #333;"></div>
-                    </el-tab-pane>
-                    <el-tab-pane label="建议" class="info">
-                        <div v-html="suggest" style="line-height: 1.6; text-indent: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); color: #333;"></div>
-                    </el-tab-pane>
-                </el-tabs>
-            </div>
-        </div>
+        </dv-border-box-11>
     </div>
-    <div v-else><el-empty description="请在后台数据参数设置界面进行道路选择">
-            <el-button type="primary" @click="router.push(`/backdata`)">点击跳转</el-button>
-        </el-empty></div>
 </template>
 
 <style scoped>
@@ -425,12 +443,13 @@ const options = [
     display: flex;
     justify-content: space-between;
     flex: 0.4;
-    min-height: 500px;
+    min-height: 400px;
     margin-bottom: 10px;
 
     .topleft,
     .topright {
         flex: 0.45;
+        /* height: 80%; */
         display: flex;
         flex-direction: column;
 
