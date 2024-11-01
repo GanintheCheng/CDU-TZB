@@ -43,6 +43,10 @@ const router = createRouter({
       component: () => import("@/components/ShowResult.vue"),
     },
     {
+      path: "/aianswer",
+      component: () => import("@/components/AiAnswer.vue"),
+    },
+    {
       path: "/",
       redirect: "/dashboard",
     },

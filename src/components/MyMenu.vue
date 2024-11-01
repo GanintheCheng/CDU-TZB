@@ -22,11 +22,11 @@ const store = useCounterStore()
         <h5 class="mb-2" style="text-wrap: nowrap;">菜单选取</h5>
         <el-menu class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose"
           :router="true">
-          <el-menu-item index="dashboard" @click="store.TopName = '控制台'">
+          <el-menu-item index="dashboard" @click="store.TopName = '可视化中控大屏'">
             <el-icon>
               <House />
             </el-icon>
-            <span>控制台</span>
+            <span>可视化中控大屏</span>
           </el-menu-item>
           <el-sub-menu index="1">
             <template #title>

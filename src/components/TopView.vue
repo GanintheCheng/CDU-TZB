@@ -24,15 +24,23 @@ const getTodayData = () => {
 }
 const todayData = ref('200')
 getTodayData()
+
+import { useRouter } from 'vue-router'
+const router = useRouter()
+const navigateToDashboard = () => {
+    router.push({ path: '/dashboard' });
+};
 </script>
 
 <template>
     <div class="top">
         <div class="left">
+            <img src="@/static/cduLogo.png" alt="">
             <img src="@/static/cdu.png" alt="">
-            <div class="text">城市交通病治理管理平台</div>
+            <img src="@/static/index.png" alt="" @click="navigateToDashboard()">
+            <div class="text" @click="navigateToDashboard()">城市交通病治理管理平台</div>
         </div>
-        <div class="right">
+        <div class="right" style="color: white;">
             <span style="margin-right: 20px;" class="none">{{ formatDate(date) }}</span>
             <span style="margin-right: 20px;" class="none">今日访问量:{{ todayData }}</span>
             <el-link type="danger" target="_blank" href="https://computer.cdu.edu.cn/" :icon="Edit">友情连接</el-link>
@@ -41,6 +49,15 @@ getTodayData()
 </template>
 
 <style scoped>
+img {
+    background-color: rgba(255, 255, 255, 0.8);
+    /* 白色半透明背景 */
+    padding: 4px;
+    /* 添加内边距 */
+    border-radius: 5px;
+    /* 圆角效果 */
+}
+
 .top {
     width: 100%;
     height: 100%;
@@ -60,7 +77,7 @@ getTodayData()
 
         .text {
             font-weight: 900;
-            color: #000;
+            color: white;
             font-size: 15px;
             /* 初始的字体阴影效果 */
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
@@ -82,7 +99,7 @@ getTodayData()
     }
 
     .right {
-        background-color: #a0cfff;
+        background-color: #162a7a;
         text-wrap: nowrap;
     }
 }

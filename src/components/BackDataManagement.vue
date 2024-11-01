@@ -239,82 +239,83 @@ const open = () => {
 
 
 <template>
-    <div>
-        <div class="inputs">
-            <div class="left">
-                <div class="item">
-                    <span class="label">道路名称:</span>
-                    <el-input class="input" v-model="name" placeholder="输入道路名称" clearable />
-                </div>
-                <div class="item">
-                    <span class="label">道路描述:</span>
-                    <el-input class="input" v-model="description" placeholder="输入自定义描述查询" clearable />
-                </div>
-                <div class="item">
-                    <span class="label">道路状态:</span>
-                    <el-select placeholder="道路状态" size="large" style="width: 130px" v-model="status">
-                        <el-option v-for="item in options1" :key="item.value" :label="item.label" :value="item.value" />
-                    </el-select>
-                </div>
-                <div class="item">
-                    <span class="label">道路拥堵值:</span>
-                    <el-select placeholder="道路拥堵值" size="large" style="width: 130px" v-model="block">
-                        <el-option v-for="item in options2" :key="item.value" :label="item.label" :value="item.value" />
-                    </el-select>
-                </div>
-                <div class="item">
-                    <span class="label">时间范围:</span>
-                    <div class="block">
-                        <el-date-picker v-model="value1" type="datetimerange" range-separator="To"
-                            start-placeholder="Start date" end-placeholder="End date" size="large" format="YYYY/MM/DD"
-                            value-format="YYYY-MM-DD hh:mm:ss" style="width:210px" />
+    <div style="height: 100%; display: flex; flex-direction: column;">
+        <dv-border-box-11 title="城市数据中心" style="width: 100%; height: 100%; position: relative;">
+            <div style="position: relative; width: 100%; height: 100%; padding: 100px 20px 40px 20px; display: flex; flex-direction: column;">
+                <div>
+                    <dv-decoration-2 style="width:100%;height:10px;" />
+                    <div class="inputs">
+                        <div class="left">
+                            <div class="item">
+                                <span class="label">道路名称:</span>
+                                <el-input class="input" v-model="name" placeholder="输入道路名称" clearable />
+                            </div>
+                            <div class="item">
+                                <span class="label">道路描述:</span>
+                                <el-input class="input" v-model="description" placeholder="输入自定义描述查询" clearable />
+                            </div>
+                            <div class="item">
+                                <span class="label">道路状态:</span>
+                                <el-select placeholder="道路状态" size="large" style="width: 130px" v-model="status">
+                                    <el-option v-for="item in options1" :key="item.value" :label="item.label"
+                                        :value="item.value" />
+                                </el-select>
+                            </div>
+                            <div class="item">
+                                <span class="label">道路拥堵值:</span>
+                                <el-select placeholder="道路拥堵值" size="large" style="width: 130px" v-model="block">
+                                    <el-option v-for="item in options2" :key="item.value" :label="item.label"
+                                        :value="item.value" />
+                                </el-select>
+                            </div>
+                            <div class="item">
+                                <span class="label">时间范围:</span>
+                                <div class="block">
+                                    <el-date-picker v-model="value1" type="datetimerange" range-separator="To"
+                                        start-placeholder="Start date" end-placeholder="End date" size="large"
+                                        format="YYYY/MM/DD" value-format="YYYY-MM-DD hh:mm:ss" style="width:210px" />
+                                </div>
+                            </div>
+                            <el-button type="primary" :icon="Search" class="bt" @click="search">查询</el-button>
+                            <el-button type="danger" :icon="Delete" class="bt" @click="myDelete"
+                                v-if="isLog">批量删除</el-button>
+                            <el-button type="primary" :icon="Search" class="bt" @click="open" v-else>登录解锁</el-button>
+                        </div>
+                        <div class="right"></div>
                     </div>
+                    <div v-loading="loading">
+                        <el-table ref="multipleTableRef" :data="tableData" style="width: 100%; margin-bottom: 50px;"
+                            @selection-change="handleSelectionChange">
+                            <el-table-column type="selection" width="55" />
+                            <el-table-column property="id" label="Id" width="80" />
+                            <el-table-column property="name" label="Name" width="160" />
+                            <el-table-column property="expedite" label="畅通比" width="80" show-overflow-tooltip />
+                            <el-table-column property="congested" label="缓行比" width="80" show-overflow-tooltip />
+                            <el-table-column property="blocked" label="拥堵比" width="80" show-overflow-tooltip />
+                            <el-table-column property="unknown" label="未知路段比" width="80" show-overflow-tooltip />
+                            <el-table-column property="status" label="路况" width="80" show-overflow-tooltip />
+                            <el-table-column property="weather" label="天气" width="160" show-overflow-tooltip />
+                            <el-table-column property="createTime" label="创建时间" width="160" show-overflow-tooltip />
+                            <el-table-column property="description" label="路况描述" show-overflow-tooltip />
+                        </el-table>
+                    </div>
+                    <dv-decoration-2 style="width:100%;height:10px;" />
+                    <!-- :page-sizes="[10, 20, 30, 40]" -->
+                    <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :small="small"
+                        :disabled="disabled" :background="background" layout="total, pager, jumper" :total="total"
+                        @size-change="handleSizeChange" @current-change="handleCurrentChange" class="big" />
+                    <el-pagination background layout="pager" :total="total" pager-count="4"
+                        @current-change="handleCurrentChange" class="small" />
                 </div>
-                <el-button type="primary" :icon="Search" class="bt" @click="search">查询</el-button>
-                <el-button type="danger" :icon="Delete" class="bt" @click="myDelete" v-if="isLog">批量删除</el-button>
-                <el-button type="primary" :icon="Search" class="bt" @click="open" v-else>登录解锁</el-button>
             </div>
-            <div class="right">
-
-            </div>
-        </div>
-        <div v-loading="loading"><el-table ref="multipleTableRef" :data="tableData"
-                style="width: 100%;margin-bottom: 50px;" @selection-change="handleSelectionChange">
-                <el-table-column type="selection" width="55" />
-                <!-- <el-table-column label="Date" width="120">
-                <template #default="scope">{{ scope.row.date }}</template>
-</el-table-column> -->
-                <el-table-column property="id" label="Id" width="80" />
-                <el-table-column property="name" label="Name" width="160" />
-                <el-table-column property="expedite" label="畅通比" width="80" show-overflow-tooltip />
-                <el-table-column property="congested" label="缓行比" width="80" show-overflow-tooltip />
-                <el-table-column property="blocked" label="拥堵比" width="80" show-overflow-tooltip />
-                <el-table-column property="unknown" label="未知路段比" width="80" show-overflow-tooltip />
-                <el-table-column property="status" label="路况" width="80" show-overflow-tooltip />
-                <el-table-column property="weather" label="天气" width="160" show-overflow-tooltip />
-                <el-table-column property="createTime" label="创建时间" width="160" show-overflow-tooltip />
-                <el-table-column property="description" label="路况描述" show-overflow-tooltip />
-                <!-- <el-table-column property="crossingId" label="CrossingId" width="80" show-overflow-tooltip /> -->
-
-            </el-table></div>
-
-        <!-- <div style="margin-top: 20px">
-            <el-button @click="toggleSelection([tableData[1], tableData[2]])">
-                Toggle selection status of second and third rows
-            </el-button>
-            <el-button @click="toggleSelection()">Clear selection</el-button>
-        </div> -->
-        <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[10, 20, 30, 40]"
-            :small="small" :disabled="disabled" :background="background"
-            layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange"
-            @current-change="handleCurrentChange" class="big" />
-        <el-pagination background layout="pager" :total="total" pager-count="4" @current-change="handleCurrentChange"
-            class="small" />
+        </dv-border-box-11>
     </div>
-
 </template>
 
 <style scoped>
+*{
+    box-sizing: border-box;
+}
 .inputs {
     width: 100%;
     display: flex;
@@ -331,16 +332,15 @@ const open = () => {
             align-items: center;
             margin-right: 10px;
             margin-bottom: 10px;
-            /* 垂直对齐中心 */
         }
 
         .label {
             margin-right: 8px;
-            /* 与输入框的间距 */
             line-height: 40px;
-            /* 设置与输入框高度一致 */
             font-size: 16px;
-            /* 确保字体大小一致 */
+            font-weight: bold;
+            color: #e1e1ff;
+            text-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
         }
 
         .input {
@@ -348,23 +348,104 @@ const open = () => {
             height: 40px;
         }
 
-        .el-input__inner {
+        /* 输入框样式 */
+        :deep(.el-input__inner) {
             height: 40px;
-            /* 设定输入框高度 */
             line-height: 40px;
-            /* 确保输入框内文字垂直居中 */
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            /* color: #ffffff; */
+        }
+
+        /* Select 下拉框样式 */
+        :deep(.el-select) {
+            .el-input__inner {
+                background-color: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                color: #ffffff;
+            }
+        }
+
+        /* DatePicker 样式 */
+        :deep(.el-date-editor) {
+            .el-input__inner {
+                background-color: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                color: #ffffff;
+            }
         }
     }
 }
 
+/* 按钮样式 */
 .bt {
     height: 40px;
     width: 80px;
     font-weight: 700;
+    color: #ffffff;
+    background: rgba(64, 158, 255, 0.8);
+    border: none;
+
+    &:hover {
+        background: rgba(64, 158, 255, 1);
+    }
 }
 
-.el-pagination {
+/* 表格样式 */
+:deep(.el-table) {
+    background-color: rgba(25, 35, 60, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    /* 表头样式 */
+    .el-table__header-wrapper th {
+        background-color: rgba(30, 40, 70, 0.9);
+        color: #e1e1ff;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* 表格单元格样式 */
+    .el-table__body-wrapper td {
+        background-color: rgba(25, 35, 60, 0.8);
+        color: #ffffff;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* 斑马纹样式 */
+    .el-table__row--striped td {
+        background-color: rgba(35, 45, 70, 0.8);
+    }
+
+    /* 鼠标悬停效果 */
+    .el-table__body tr:hover>td {
+        background-color: rgba(45, 55, 80, 0.9) !important;
+    }
+}
+
+/* 分页器样式 */
+:deep(.el-pagination) {
     justify-content: center;
+    background: transparent;
+
+    .el-pagination__total,
+    .el-pagination__jump,
+    .btn-prev,
+    .btn-next {
+        color: #e1e1ff;
+    }
+
+    .el-pager li {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: #e1e1ff;
+
+        &.is-active {
+            background-color: #409EFF;
+            color: #ffffff;
+        }
+
+        &:hover {
+            background-color: rgba(64, 158, 255, 0.8);
+        }
+    }
 }
 
 .big {
@@ -388,6 +469,5 @@ const open = () => {
     .small {
         display: flex;
     }
-
 }
 </style>

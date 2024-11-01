@@ -87,7 +87,7 @@ export const useCounterStore = defineStore(
         forbidden: 1,
       },
     ];
-    const TopName = "控制台";
+    const TopName = "ke'shi";
     const isInput = false;
     const isLog = false;
     const num = ref(200)

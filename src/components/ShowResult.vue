@@ -1,31 +1,33 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import axios from 'axios'
+import * as echarts from 'echarts'
+import WordCloud from './WordCloud.vue' // 引入词云组件
+
+const chartRefs = ref<(HTMLElement | null)[]>([])
 
 interface Answer {
-  text: string;
-  count: number;
+  text: string
+  count: number
 }
 
 interface Question {
-  question: string;
-  answers: Answer[];
-  totalResponses: number;
+  question: string
+  answers: Answer[]
+  totalResponses: number
 }
 
 const loading = ref(true)
 const surveyData = ref<Question[]>([])
 
 const processData = (rawData: string) => {
-  // 首先将 HTML 标签的 <br> 转换为实际的换行符 \n
   const cleanData = rawData.replace(/<br>/g, '\n')
-  
+
   const sections = cleanData.split(/\d+\./).filter(Boolean)
   return sections.map(section => {
-    // 分割问题和答案，使用换行符分割
     const lines = section.trim().split('\n').filter(line => line.trim())
     const question = lines[0].trim()
-    
+
     const processedAnswers = lines.slice(1)
       .filter(answer => answer.includes('被选择的次数是:'))
       .map(answer => {
@@ -51,16 +53,91 @@ const totalSurveyResponses = computed(() => {
   return surveyData.value[0].totalResponses
 })
 
-const getPercentage = (count: number, total: number) => {
-  return ((count / total) * 100).toFixed(1)
+// 词云数据生成
+const generateWordCloudData = (answers: Answer[]) => {
+  return answers.map(answer => ({
+    name: answer.text,
+    value: answer.count
+  }))
 }
 
-const getColorByPercentage = (percentage: number) => {
-  // 根据百分比返回不同深度的蓝色
-  const baseHue = 210 // 蓝色
-  const saturation = 90
-  const lightness = Math.max(30, 80 - (percentage * 0.5))
-  return `hsl(${baseHue}, ${saturation}%, ${lightness}%)`
+const renderCharts = async () => {
+  await nextTick()
+  surveyData.value.forEach((question, index) => {
+    if (index < surveyData.value.length - 4) {
+      // 饼状图逻辑
+      if (chartRefs.value[index]) {
+        const chartDom = chartRefs.value[index]!
+        const chart = echarts.init(chartDom)
+
+        const option = {
+          backgroundColor: 'transparent', // 透明背景以融入深蓝色背景
+          title: {
+            text: question.question,
+            left: 'center',
+            textStyle: {
+              color: '#fff', // 白色文本以提升在深色背景上的可读性
+              fontSize: 16,
+              fontWeight: 'normal'
+            }
+          },
+          tooltip: {
+            trigger: 'item',
+            formatter: '{a} <br/>{b}: {c} ({d}%)',
+            backgroundColor: 'rgba(50, 50, 50, 0.9)', // 深色工具提示背景
+            borderColor: 'rgba(100, 100, 100, 0.5)',
+            textStyle: {
+              color: '#fff' // 工具提示中的文本为白色
+            }
+          },
+          series: [
+            {
+              name: '回答分布',
+              type: 'pie',
+              radius: '60%',
+              color: [
+                '#3498db', // 柔和的蓝色
+                '#2ecc71', // 绿色
+                '#e74c3c', // 红色
+                '#f39c12', // 橙色
+                '#9b59b6', // 紫色
+                '#1abc9c'  // 青色
+              ],
+              data: question.answers.map(answer => ({
+                value: answer.count,
+                name: `${answer.text} (${answer.count})`
+              })),
+              label: {
+                color: '#fff', // 标签为白色
+                fontSize: 12
+              },
+              labelLine: {
+                lineStyle: {
+                  color: 'rgba(255, 255, 255, 0.5)' // 柔和的白色线条
+                }
+              },
+              emphasis: {
+                itemStyle: {
+                  shadowBlur: 20,
+                  shadowOffsetX: 0,
+                  shadowColor: 'rgba(0, 0, 0, 0.7)', // 深色阴影
+                  borderColor: 'rgba(255, 255, 255, 0.2)', // 边框为柔和白色
+                  borderWidth: 2
+                }
+              }
+            }
+          ]
+        }
+
+
+        chart.setOption(option)
+      }
+    } else {
+      // 词云逻辑
+      const wordCloudData = generateWordCloudData(question.answers)
+      // 这里需要你放置词云的渲染逻辑，可能需要在 WordCloud 组件内完成
+    }
+  })
 }
 
 onMounted(async () => {
@@ -68,6 +145,9 @@ onMounted(async () => {
     const response = await axios.get('http://47.108.190.192:8090/api/survey')
     surveyData.value = processData(response.data.data)
     loading.value = false
+
+    // 延迟渲染图表，确保 DOM 已经准备好
+    setTimeout(renderCharts, 100)
   } catch (error) {
     console.error('Failed to fetch survey data:', error)
     loading.value = false
@@ -76,198 +156,129 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="survey-container">
-    <el-card class="summary-card">
-      <template #header>
-        <div class="card-header">
-          <h1 class="title">调查问卷统计结果</h1>
-          <div class="total-responses">
-            总计回答: <span class="response-number">{{ totalSurveyResponses }}</span> 份
-          </div>
-        </div>
-      </template>
-
-      <el-skeleton :loading="loading" animated :rows="6">
-        <template #default>
-          <div class="questions-grid">
-            <el-card 
-              v-for="(item, index) in surveyData" 
-              :key="index" 
-              class="question-card"
-              shadow="hover"
-            >
-              <template #header>
-                <h2 class="question-title">{{ item.question }}</h2>
-              </template>
-
-              <div class="answers-container">
-                <div 
-                  v-for="(answer, answerIndex) in item.answers" 
-                  :key="answerIndex" 
-                  class="answer-item"
-                >
-                  <div class="answer-header">
-                    <span class="answer-text">{{ answer.text }}</span>
-                    <div class="answer-stats">
-                      <span class="answer-count">{{ answer.count }}</span>
-                      <span class="answer-percentage">
-                        ({{ getPercentage(answer.count, item.totalResponses) }}%)
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div class="progress-container">
-                    <div 
-                      class="progress-bar"
-                      :style="{
-                        width: `${(answer.count / item.totalResponses) * 100}%`,
-                        backgroundColor: getColorByPercentage((answer.count / item.totalResponses) * 100)
-                      }"
-                    ></div>
-                  </div>
+  <div style="height: 100%; overflow: hidden;">
+    <dv-border-box-11 title="问卷结果展示" style="width: 100%; height: 100%; position: relative;">
+      <div style="position: absolute; top: 60px; bottom: 40px; left: 20px; right: 20px; overflow: auto;">
+        <div class="survey-container">
+          <el-card class="summary-card">
+            <template #header>
+              <div class="card-header">
+                <div class="total-responses">
+                  总计回答: <span class="response-number">{{ totalSurveyResponses }}</span> 份
                 </div>
               </div>
-
-              <div class="question-footer">
-                <span class="total-text">总计回答: {{ item.totalResponses }}</span>
-              </div>
-            </el-card>
-          </div>
-        </template>
-      </el-skeleton>
-    </el-card>
+            </template>
+            <el-skeleton :loading="loading" animated :rows="6">
+              <template #default>
+                <div class="questions-grid">
+                  <el-card v-for="(item, index) in surveyData" :key="index" class="question-card" shadow="hover" style="overflow: visible;">
+                    <div v-if="index < surveyData.length - 4">
+                      <div ref="chartRefs" class="pie-chart" style="width: 100%; height: 400px;"></div>
+                    </div>
+                    <div v-else>
+                      <h3 class="word-cloud-title">{{ item.question }}</h3>
+                      <WordCloud :data="generateWordCloudData(item.answers)" class="word-cloud"
+                        style="width: 100%; height: 400px;" />
+                    </div>
+                  </el-card>
+                </div>
+              </template>
+            </el-skeleton>
+          </el-card>
+        </div>
+      </div>
+    </dv-border-box-11>
   </div>
 </template>
 
 <style scoped>
 .survey-container {
-  padding: 20px;
-  max-width: 1400px;
-  margin: 0 auto;
-  background-color: #f5f7fa;
-  min-height: 100vh;
+  width: 100%;
+  height: 100%;
+  background-color: #001f3f;
+  /* 深蓝色背景 */
 }
 
 .summary-card {
   margin-bottom: 24px;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.1);
+  /* 半透明白色 */
+  border-radius: 8px;
 }
 
 .card-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-}
-
-.title {
-  font-size: 24px;
-  color: #303133;
-  margin: 0;
 }
 
 .total-responses {
   font-size: 16px;
-  color: #606266;
+  color: #ffffff;
+  /* 白色文本 */
 }
 
 .response-number {
   font-size: 20px;
-  color: #409eff;
+  color: #1e90ff;
+  /* 明亮蓝色 */
   font-weight: bold;
 }
 
 .questions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 24px;
+  width: 100%;
 }
 
 .question-card {
   height: 100%;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.1);
+  /* 半透明白色 */
+  border-radius: 8px;
+  color: #ffffff;
+  /* 白色文本 */
 }
 
-.question-title {
-  font-size: 16px;
-  color: #303133;
-  margin: 0;
-  font-weight: 600;
+.pie-chart {
+  width: 100%;
+  height: 400px;
 }
 
-.answers-container {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.word-cloud {
+  width: 100%;
+  height: 400px;
 }
 
-.answer-item {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.word-cloud-title {
+  font-size: 20px;
+  margin: 16px 0;
+  text-align: center;
+  color: #ffffff;
+  /* 白色文本 */
 }
 
-.answer-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.answer-text {
-  font-size: 14px;
-  color: #606266;
-  flex: 1;
-}
-
-.answer-stats {
-  white-space: nowrap;
-  margin-left: 12px;
-}
-
-.answer-count {
-  font-weight: 600;
-  color: #409eff;
-}
-
-.answer-percentage {
-  color: #909399;
-  margin-left: 4px;
-}
-
-.progress-container {
-  height: 8px;
-  background-color: #ebeef5;
+/* 自定义下拉条样式 */
+.el-select {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid #1e90ff;
+  /* 明亮蓝色边框 */
   border-radius: 4px;
-  overflow: hidden;
+  color: #ffffff;
+  /* 白色文本 */
 }
 
-.progress-bar {
-  height: 100%;
-  transition: width 0.3s ease;
-  border-radius: 4px;
-}
-
-.question-footer {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid #ebeef5;
-}
-
-.total-text {
-  font-size: 14px;
-  color: #909399;
+.el-select__caret {
+  color: #1e90ff;
+  /* 明亮蓝色 */
 }
 
 @media (max-width: 768px) {
-  .survey-container {
-    padding: 12px;
-  }
-
   .questions-grid {
     grid-template-columns: 1fr;
-  }
-
-  .card-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
   }
 }
 </style>

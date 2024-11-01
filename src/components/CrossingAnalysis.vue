@@ -59,27 +59,30 @@ const status = ref('')
 
 const option1 = ref({
     title: {
-        text: '路口图'
+        text: '路口图',
+        textStyle: {
+            color: '#fff' // 标题字体颜色
+        }
     },
     tooltip: {
         trigger: 'axis',
         formatter: function (params: any) {
-            let tooltipHtml = '<strong>' + params[0].axisValueLabel + '</strong><br>';
+            let tooltipHtml = '<strong style="color:#6e84da;">' + params[0].axisValueLabel + '</strong><br>';
             params.forEach((param: any) => {
                 tooltipHtml +=
                     '<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' +
                     param.color +
                     '"></span>' +
-                    param.seriesName +
-                    ': <strong>' +
-                    param.value +
-                    '%</strong><br>';
+                    param.seriesName + ': <strong style="color: #6e84da;">' + param.value + '%</strong><br>';
             });
             return tooltipHtml;
         }
     },
     legend: {
-        data: ['畅通比', '缓行比', '拥堵比']
+        data: [ '缓行比', '拥堵比'],
+        textStyle: {
+            color: '#fff' // 图例字体颜色
+        }
     },
     grid: {
         left: '0%',
@@ -94,52 +97,54 @@ const option1 = ref({
     },
     xAxis: {
         type: 'category',
-        boundaryGap: true, // 确保柱状图不贴近左侧
-        data: dateArray.value
+        boundaryGap: true,
+        data: dateArray.value,
+        axisLabel: {
+            color: '#fff' // X轴标签颜色
+        }
     },
     yAxis: {
         type: 'value',
         max: 10,
         min: 0,
         axisLabel: {
-            formatter: '{value}%'
+            formatter: '{value}%',
+            color: '#fff' // Y轴标签颜色
         }
     },
     series: [
         {
             name: '缓行比',
             type: 'bar',
-            color: '#baa381',
+            color: '#00bfff', // 明亮蓝色
             data: [6.09, 8.43, 6.81, 2.95, 5.75, 8.26, 6.83, 6.22]
         },
         {
             name: '拥堵比',
             type: 'bar',
-            color: 'red',
+            color: '#ff4500', // 明亮橙红色
             data: [1.08, 2.18, 1.4, 0.46, 1.25, 2.88, 1.99, 1.42]
         }
     ]
 });
 
-
-
 const option2: ECOption = {
     title: {
-        text: '路段图'
+        text: '路段图',
+        textStyle: {
+            color: '#fff' // 标题字体颜色
+        }
     },
     tooltip: {
         trigger: 'axis',
         formatter: function (params: any) {
-            let tooltipHtml = '<strong>' + '状态次数' + '</strong><br>';
+            let tooltipHtml = '<strong style="color: #6e84da;">状态次数</strong><br>';
             params.forEach((param: any) => {
                 tooltipHtml +=
                     '<span style="display:inline-block;margin-right:5px;border-radius:10px;width:9px;height:9px;background-color:' +
                     param.color +
                     '"></span>' +
-                    '次数' +
-                    ': <strong>' +
-                    param.value +
-                    '</strong><br>';
+                    '次数: <strong style="color: #6e84da;">' + param.value + '</strong><br>';
             });
             return tooltipHtml;
         }
@@ -154,17 +159,24 @@ const option2: ECOption = {
         type: 'category',
         data: ['天府大道北段', '科华南路', '天府大道中段', '成都绕城高速', '成灌高速', '水碾河路', '川陕路'],
         axisLabel: {
-            interval: 0,  // 强制显示所有标签
-            rotate: 45  // 旋转标签
+            interval: 0,
+            rotate: 45,
+            color: '#fff' // X轴标签颜色
         }
     },
     yAxis: {
-        type: 'value'
+        type: 'value',
+        axisLabel: {
+            color: '#fff' // Y轴标签颜色
+        }
     },
     series: [
         {
             data: [150, 230, 224, 218, 135, 147, 260],
-            type: 'bar'
+            type: 'bar',
+            itemStyle: {
+                color: '#00bfff' // 明亮蓝色
+            }
         }
     ]
 };
@@ -355,9 +367,9 @@ const options = [
 </script>
 
 <template>
-    <div style="height: 100%; width: 100%; display: flex; justify-content: center;">
-        <dv-border-box-11 title="可视化中控大屏" style="width: 100%; height: 100%; position: relative;">
-            <div style="position: relative; height: 100%; padding: 60px 20px 20px 20px;">
+    <div class="datav-container">
+        <dv-border-box-11 :title="name">
+            <div class="content-wrapper">
                 <div class="box" v-loading="loading" v-if="id != undefined || ''">
                     <div class="top">
                         <div class="topleft">
@@ -368,163 +380,206 @@ const options = [
                                         <el-date-picker v-model="date" type="daterange" start-placeholder="起始"
                                             end-placeholder="终点" format="YYYY/MM/DD" value-format="YYYY-MM-DD"
                                             :default-value="[new Date(2024, 7, 1), new Date(2024, 7, 7)]"
-                                            style="width: 220px;" />
+                                            class="date-picker" />
                                     </div>
                                 </div>
-                                <div class="pic" ref="chartRef1" style="height: 100%;"></div>
+                                <div class="pic" ref="chartRef1"></div>
                             </dv-border-box10>
-
                         </div>
                         <div class="topright">
                             <dv-border-box10>
                                 <div class="info">
                                     <div class="name">{{ name }}</div>
-                                    <el-select placeholder="状态选择(默认畅通)" style="width: 240px" v-model="status">
+                                    <el-select placeholder="状态选择(默认畅通)" class="status-select" v-model="status">
                                         <el-option v-for="item in options" :key="item.value" :label="'状态:' + item.label"
                                             :value="item.value" />
                                     </el-select>
                                 </div>
-                                <div class="pic" ref="chartRef2" style="height: 100%;"></div>
+                                <div class="pic" ref="chartRef2"></div>
                             </dv-border-box10>
                         </div>
                     </div>
-                    <dv-border-box12>
-
-                    </dv-border-box12>
+                    <dv-decoration-5 style="width:100%;" dur="10"/>
+                    <dv-border-box12 class="middle-box"></dv-border-box12>
                     <div class="bt">
                         <div class="btbox">
+                            <dv-decoration-3 style="width:100%;height: 10px;overflow-y: hidden;" />
                             <div class="name">
                                 功能菜单 | 分析数据截止时间{{ nowTime }}
                             </div>
-                            <el-tabs type="border-card">
+                            <el-tabs type="border-card" class="custom-tabs">
                                 <el-tab-pane label="数据分析" class="info">
-                                    <div v-html="analysis"
-                                        style="line-height: 1.6; text-indent: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); color: #333;">
-                                    </div>
-
+                                    <div class="content-panel" v-html="analysis"></div>
                                 </el-tab-pane>
                                 <el-tab-pane label="未来预测" class="info">
-                                    <div v-html="predict"
-                                        style="line-height: 1.6; text-indent: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); color: #333;">
-                                    </div>
+                                    <div class="content-panel" v-html="predict"></div>
                                 </el-tab-pane>
                                 <el-tab-pane label="原因" class="info">
-                                    <div v-html="reason"
-                                        style="line-height: 1.6; text-indent: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); color: #333;">
-                                    </div>
+                                    <div class="content-panel" v-html="reason"></div>
                                 </el-tab-pane>
                                 <el-tab-pane label="建议" class="info">
-                                    <div v-html="suggest"
-                                        style="line-height: 1.6; text-indent: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); color: #333;">
-                                    </div>
+                                    <div class="content-panel" v-html="suggest"></div>
                                 </el-tab-pane>
                             </el-tabs>
                         </div>
                     </div>
                 </div>
-                <div v-else><el-empty description="请在后台数据参数设置界面进行道路选择">
+                <div v-else class="empty-state">
+                    <el-empty description="请在后台数据参数设置界面进行道路选择">
                         <el-button type="primary" @click="router.push(`/backdata`)">点击跳转</el-button>
-                    </el-empty></div>
+                    </el-empty>
+                </div>
             </div>
         </dv-border-box-11>
     </div>
 </template>
 
 <style scoped>
+* {
+    overflow-x: hidden;
+    /* 禁止左右滑动 */
+}
+
+.datav-container {
+    width: 100%;
+    /* height: 100vh; */
+    background-color: #061d3c;
+    color: #fff;
+    overflow-x: hidden;
+    /* 禁止左右滑动 */
+}
+
+.content-wrapper {
+    height: 100%;
+    padding: 60px 20px 20px 20px;
+    /* overflow-y: auto; */
+}
+
 .box {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    /* height: 100%; */
-    width: 100%;
+    gap: 20px;
+    height: auto;
+    min-height: 100%;
 }
 
 .top {
     display: flex;
     justify-content: space-between;
-    flex: 0.4;
-    min-height: 400px;
-    margin-bottom: 10px;
+    gap: 20px;
+    height: 400px;
+}
 
-    .topleft,
-    .topright {
-        flex: 0.45;
-        /* height: 80%; */
-        display: flex;
-        flex-direction: column;
+.topleft,
+.topright {
+    flex: 0.5;
+    display: flex;
+    flex-direction: column;
+    background: rgba(6, 30, 93, 0.5);
+    border-radius: 8px;
+}
 
-        .info {
-            flex: 0.1;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
+.info {
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: rgba(255, 255, 255, 0.05);
+}
 
-            .name {
-                font-size: 10px;
-                font-weight: bold;
-                width: 100px;
-                text-wrap: nowrap;
-                flex: 0.1;
-                margin-right: 20px;
-            }
+.name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #00f0ff;
+    white-space: nowrap;
+}
 
-            .date {
-                flex: 0.1;
-            }
-        }
+.date-picker,
+.status-select {
+    width: 240px;
+    --el-select-bg-color: rgba(0, 0, 0, 0.3);
+    --el-select-text-color: #fff;
+    --el-select-border-color: #00f0ff;
+}
 
-        .pic {
-            flex: 0.9;
-        }
-    }
+.pic {
+    flex: 1;
+    min-height: 300px;
+    padding: 15px;
 }
 
 .bt {
-    flex: 0.55;
-
-    .btbox {
-        margin: 0 auto;
-        width: 60%;
-        height: 100%;
-
-        .info {
-            font-size: 15px;
-        }
-
-        .name {
-            font-size: 15px;
-            font-weight: bold;
-        }
-
-        /* border: 1px solid #000; */
-    }
+    flex: 1;
+    height: 200px;
+    overflow-y: auto;
+    /* 允许bt区上下滚动 */
 }
 
-/* Media query for mobile devices */
-@media (max-width: 768px) {
-    .top {
-        flex-direction: column;
+.btbox {
+    width: 80%;
+    height:300px;
+    margin: 0 auto;
+    background: rgba(6, 30, 93, 0.5);
+    border-radius: 8px;
+    padding: 20px;
+}
 
-        .topleft,
-        .topright {
-            flex: 1;
-            width: 100%;
+.custom-tabs {
+    margin-top: 15px;
+    background: transparent;
+    border: none;
+}
 
-            .pic {
-                height: 300px;
-                /* Adjust the height as needed */
-            }
-        }
-    }
+.content-panel {
+    line-height: 1.6;
+    text-indent: 20px;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    color: #fff;
+    margin: 10px 0;
+}
 
-    .bt {
-        .btbox {
-            width: 100%;
-        }
-    }
+/* 深色主题下的Tab样式 */
+:deep(.el-tabs) {
+    --el-tabs-header-background-color: rgba(0, 0, 0, 0.3);
+    --el-tabs-border-color: #00f0ff;
+    --el-color-primary: #00f0ff;
+}
 
-    .box {
-        height: 200%;
-    }
+:deep(.el-tabs__item) {
+    color: black !important;
+}
+
+:deep(.el-tabs__item.is-active) {
+    color: red !important;
+}
+
+
+/* 自定义滚动条 */
+.btbox::-webkit-scrollbar {
+    width: 6px;
+}
+
+.btbox::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.btbox::-webkit-scrollbar-thumb {
+    background: rgba(0, 240, 255, 0.5);
+    border-radius: 3px;
+}
+
+.el-main ::-webkit-scrollbar {
+    width: 6px;
+}
+
+.el-main ::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.el-main ::-webkit-scrollbar-thumb {
+    background: rgba(0, 240, 255, 0.5);
+    border-radius: 3px;
 }
 </style>

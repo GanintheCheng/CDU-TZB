@@ -8,13 +8,14 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AboutUs: typeof import('./src/components/AboutUs.vue')['default']
+    AiAnswer: typeof import('./src/components/AiAnswer.vue')['default']
     BackData: typeof import('./src/components/BackData.vue')['default']
     BackDataManagement: typeof import('./src/components/BackDataManagement.vue')['default']
     ChangeBackData: typeof import('./src/components/ChangeBackData.vue')['default']
     CrossingAnalysis: typeof import('./src/components/CrossingAnalysis.vue')['default']
     DashBoard: typeof import('./src/components/DashBoard.vue')['default']
     ElAlert: typeof import('element-plus/es')['ElAlert']
-    ElAside: typeof import('element-plus/es')['ElAside']
+    ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']
     ElCheckboxButton: typeof import('element-plus/es')['ElCheckboxButton']
@@ -46,6 +47,7 @@ declare module 'vue' {
     ElRate: typeof import('element-plus/es')['ElRate']
     ElResult: typeof import('element-plus/es')['ElResult']
     ElRow: typeof import('element-plus/es')['ElRow']
+    ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     ElSelect: typeof import('element-plus/es')['ElSelect']
     ElSkeleton: typeof import('element-plus/es')['ElSkeleton']
     ElStatistic: typeof import('element-plus/es')['ElStatistic']
@@ -60,11 +62,13 @@ declare module 'vue' {
     MyMenu: typeof import('./src/components/MyMenu.vue')['default']
     NowData: typeof import('./src/components/NowData.vue')['default']
     QuestionNaire: typeof import('./src/components/QuestionNaire.vue')['default']
+    ResultAnalysis: typeof import('./src/components/ResultAnalysis.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ShowResult: typeof import('./src/components/ShowResult.vue')['default']
     SurveyResults: typeof import('./src/components/SurveyResults.vue')['default']
     TopView: typeof import('./src/components/TopView.vue')['default']
+    WordCloud: typeof import('./src/components/WordCloud.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

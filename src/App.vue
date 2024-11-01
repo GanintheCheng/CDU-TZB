@@ -17,7 +17,7 @@ const route = useRoute()
 
 watch(() => route.fullPath, (newPath:string, oldPath:string) => {
   if(newPath.includes('/dashboard')){
-    store.TopName = '控制台'
+    store.TopName = '⚡️ 可视化中控大屏'
   }else if(newPath.includes('/nowdata')){
     store.TopName = '实时数据查询'
   }else if(newPath.includes('/backdata')){
@@ -46,12 +46,12 @@ watch(() => route.fullPath, (newPath:string, oldPath:string) => {
         <!-- <el-button class="menu-button" @click="isDrawerVisible = true">Menu</el-button> -->
       </el-header>
       <el-container>
-        <el-aside class="menu" style="max-width: 200px;">
+        <!-- <el-aside class="menu" style="max-width: 200px;">
           <MyMenu />
-        </el-aside>
+        </el-aside> -->
         <el-container class="right">
-          <el-header class="righttop">{{ store.TopName }}</el-header>
-          <el-main>
+          <!-- <el-header class="righttop"  v-if="store.TopName!='控制台'">{{ store.TopName }}</el-header> -->
+          <el-main style="background-color: #020d3b;">
             <router-view v-slot="{ Component, route }">
               <transition name="Mainfade" mode="out-in">
                 <component :is="Component" :key="route.path" />
@@ -116,7 +116,7 @@ body {
 }
 
 .head {
-  background-color: #a0cfff;
+  background-color: #162a7a;
   border-radius: 10px;
   padding-right: 20px;
 }
@@ -126,11 +126,11 @@ body {
 }
 
 .el-footer {
-  background-color: #909399;
+  background-color: #000000;
+  color: white;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  border-radius: 8px;
 }
 
 .el-container {

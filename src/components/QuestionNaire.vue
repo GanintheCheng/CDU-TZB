@@ -252,116 +252,90 @@ const isInput = ref(store.isInput)
 </script>
 
 <template>
-    <div>
-        <div class="top">
-            <header class="header">
-                <h1>城市拥堵调查问卷</h1>
-            </header>
-            <div class="title">
-                <div class="item">
-                    <div class="imgbox" style="background-color:#dfeaee ;">
-                        <img src="@/static/header01.svg" alt="">
-                    </div>
-                    <div class="text">匿名回答 我们保证您的信息安全</div>
-                </div>
-                <div class="item">
-                    <div class="imgbox" style="background-color:#ebe7dc ;">
-                        <img src="@/static/header02.svg" alt="">
-                    </div>
-                    <div class="text">了解城市拥堵的根源与解决方案</div>
-                </div>
-                <div class="item">
-                    <div class="imgbox" style="background-color: #ece3f2;">
-                        <img src="@/static/header03.svg" alt="">
-                    </div>
-                    <div class="text">真实回答 共建美好成都 </div>
-                </div>
-            </div>
-        </div>
+    <div style="height: 100%; display: flex; flex-direction: column;">
+        <dv-border-box-11 title="城市拥堵调查问卷" style="width: 100%; height: 100%; position: relative;">
+            <div style="position: relative; width: 100%; height: 100%; padding: 60px 20px 40px 20px; display: flex; flex-direction: column;">
 
-        <div v-if="!isInput">
-            <div class="progress">
-                <el-progress :percentage="(nowNum + 1) * 20" :stroke-width="15" striped
-                    style="max-width: 1000px;margin: 0 auto;" />
-            </div>
-            <transition name="el-zoom-in-center">
-                <div v-show="show" class="transition-box">
-                    <div class="question">
-                        <div class="questiontitle">
-                            <h3 v-show="nowNum == 0">基本信息</h3>
-                            <h3 v-show="nowNum == 1">交通问题反馈</h3>
-                            <h3 v-show="nowNum == 2">公共交通工具的使用</h3>
-                            <h3 v-show="nowNum == 3">政府优先考虑方面</h3>
-                            <h3 v-show="nowNum == 4">建议与期望</h3>
+                <div v-if="!isInput" style="flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div class="progress">
+                            <el-progress :percentage="(nowNum + 1) * 20" :stroke-width="15" striped
+                                style="max-width: 1000px; margin: 0 auto;" />
+                                <dv-decoration-10 style="width:100%;height:10px;" />
                         </div>
-                        <div class="item" v-for="(item, index) in question" :key="index">
-                            <div v-if="item.range == nowNum">
-                                <div class="num">
-                                    {{ item.title }}
-                                    <span v-if="item.type == 0">(单选)</span>
-                                    <span v-if="item.type == 1">(多选)</span>
-                                </div>
-                                <div class="info">
-                                    <el-radio-group v-model="item.choice" size="large" v-if="item.type == 0">
-                                        <el-radio-button v-for="(item2, index2) in item.question" :key="index2"
-                                            :value="index2 + ''">
-                                            {{ item2 }}
-                                        </el-radio-button>
-                                    </el-radio-group>
-                                    <el-checkbox-group v-model="item.choice" size="large" v-if="item.type == 1">
-                                        <el-checkbox-button v-for="(item2, index2) in item.question" :key="index2"
-                                            :value="index2 + ''">
-                                            {{ item2 }}
-                                        </el-checkbox-button>
-                                    </el-checkbox-group>
-                                    <div style="margin-top: 10px;">
-                                        <el-input v-model="item.input" style="width: 240px" placeholder="请输入您的想法"
-                                            clearable v-if="index == 3 && item.choice.includes('6')" />
-                                        <el-input v-model="item.input" style="width: 240px" placeholder="请输入您的想法"
-                                            clearable v-if="index == 4 && item.choice.includes('9')" />
-                                        <el-input v-model="item.input" style="width: 240px" placeholder="请输入您的想法"
-                                            clearable v-if="index == 6 && item.choice.includes('5')" />
-                                        <el-input v-model="item.input" style="width: 240px" placeholder="请输入您的想法"
-                                            clearable v-if="index == 7 && item.choice.includes('5')" />
-                                        <el-input v-model="item.input" style="width: 240px" placeholder="请输入您的想法"
-                                            clearable v-if="index == 9 && item.choice.includes('3')" />
-                                        <el-input v-model="item.input" style="width: 240px" placeholder="请输入您的想法"
-                                            clearable v-if="index == 10 && item.choice == '4'" />
-                                        <el-input v-model="item.input" style="width: 240px" placeholder="请输入您的回答"
-                                            clearable v-if="item.type == 2" />
+                        <transition name="el-zoom-in-center">
+                            <div v-show="show" class="transition-box">
+                                <div class="question">
+                                    <div class="questiontitle">
+                                        <h3 v-show="nowNum == 0">基本信息</h3>
+                                        <h3 v-show="nowNum == 1">交通问题反馈</h3>
+                                        <h3 v-show="nowNum == 2">公共交通工具的使用</h3>
+                                        <h3 v-show="nowNum == 3">政府优先考虑方面</h3>
+                                        <h3 v-show="nowNum == 4">建议与期望</h3>
+                                    </div>
+                                    <div class="item" v-for="(item, index) in question" :key="index">
+                                        <div v-if="item.range == nowNum">
+                                            <div class="num">
+                                                {{ item.title }}
+                                                <span v-if="item.type == 0">(单选)</span>
+                                                <span v-if="item.type == 1">(多选)</span>
+                                            </div>
+                                            <div class="info">
+                                                <el-radio-group v-model="item.choice" size="large" v-if="item.type == 0">
+                                                    <el-radio-button v-for="(option, index) in item.question" :key="index" :value="index + ''">
+                                                        {{ option }}
+                                                    </el-radio-button>
+                                                </el-radio-group>
+                                                <el-checkbox-group v-model="item.choice" size="large" v-if="item.type == 1">
+                                                    <el-checkbox-button v-for="(option, index) in item.question" :key="index" :value="index + ''">
+                                                        {{ option }}
+                                                    </el-checkbox-button>
+                                                </el-checkbox-group>
+                                                <div style="margin-top: 10px;">
+                                                    <el-input v-model="item.input" style="width: 240px" placeholder="请输入您的想法" clearable v-if="index == 3 && item.choice.includes('6')" />
+                                                    <el-input v-model="item.input" style="width: 240px" placeholder="请输入您的想法" clearable v-if="index == 4 && item.choice.includes('9')" />
+                                                    <el-input v-model="item.input" style="width: 240px" placeholder="请输入您的想法" clearable v-if="index == 6 && item.choice.includes('5')" />
+                                                    <el-input v-model="item.input" style="width: 240px" placeholder="请输入您的想法" clearable v-if="index == 7 && item.choice.includes('5')" />
+                                                    <el-input v-model="item.input" style="width: 240px" placeholder="请输入您的想法" clearable v-if="index == 9 && item.choice.includes('3')" />
+                                                    <el-input v-model="item.input" style="width: 240px" placeholder="请输入您的想法" clearable v-if="index == 10 && item.choice == '4'" />
+                                                    <el-input v-model="item.input" style="width: 240px" placeholder="请输入您的回答" clearable v-if="item.type == 2" />
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-
-                        </div>
+                        </transition>
+                        <dv-decoration-10 style="width:100%;height:10px;" />
+                    </div>
+                    <div class="bt">
+                        <el-button type="primary" round size="20px" :disabled="nowNum == 0" @click="handleNum(-1)">上一个</el-button>
+                        <el-button type="success" round size="20px" :disabled="nowNum == 4" @click="handleNum(1)">下一个</el-button>
+                        <el-button type="danger" round size="20px" v-show="nowNum == 4" @click="commit" :disabled="isInput">提交</el-button>
+                        <dv-decoration-12 style="width:50px;height:50px;" />
                     </div>
                 </div>
-            </transition>
-
-            <div class="bt">
-                <el-button type="primary" round size="20px" :disabled="nowNum == 0"
-                    @click="handleNum(-1)">上一个</el-button>
-                <el-button type="success" round size="20px" :disabled="nowNum == 4"
-                    @click="handleNum(1)">下一个</el-button>
-                <el-button type="danger" round size="20px" v-show="nowNum == 4" @click="commit"
-                    :disabled="isInput">提交</el-button>
+                <div v-else>
+                    <el-card style="width: 100%;">
+                        <template #header>
+                            <div class="card-header">
+                                <span>感谢填写！</span>
+                            </div>
+                        </template>
+                        <el-result icon="success" title="填写成功" sub-title="欢迎分享链接"></el-result>
+                        <template #footer>共创美好明天</template>
+                    </el-card>
+                </div>
             </div>
-        </div>
-        <div v-else style="">
-            <el-card style="width: 100%;">
-                <template #header>
-                    <div class="card-header">
-                        <span>感谢填写！</span>
-                    </div>
-                </template>
-                <el-result icon="success" title="填写成功" sub-title="欢迎分享链接"></el-result>
-                <template #footer>共创美好明天</template>
-            </el-card>
-        </div>
+        </dv-border-box-11>
     </div>
 </template>
 
 <style scoped>
+* {
+    box-sizing: border-box;
+}
+
 .header {
     display: flex;
     justify-content: center;
@@ -377,25 +351,25 @@ const isInput = ref(store.isInput)
 
 .title {
     width: 100%;
-    height: 200px;
-    background-color: white;
+    height: auto;
+    background-color: #020d3b;
+    color: #f0f0f0; /* 修改字体颜色 */
     display: flex;
     justify-content: center;
-    align-items: baseline;
-    margin-bottom: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 0;
 
     .item {
         width: 200px;
         height: 200px;
-        /* margin-right: 100px; */
-        /* margin-right: 50px; */
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        margin: 10px;
 
         .imgbox {
-            /* background-color: skyblue; */
             width: 100%;
             display: flex;
             justify-content: center;
@@ -405,30 +379,30 @@ const isInput = ref(store.isInput)
         img {
             height: 100px;
             width: 100px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         .text {
             width: 80%;
             font-size: 14px;
+            text-align: center;
+            color: #ffffff; /* 确保文字在深色背景上清晰可读 */
         }
     }
 }
 
-.title .item {
-    margin-right: 50px;
-}
-
 .question {
+    color: #f0f0f0; /* 修改字体颜色 */
+
     h3 {
         font-size: 25px;
+        color: #ffffff; /* 确保标题清晰可读 */
     }
 
-    margin-top: 10px;
-    background-color: white;
+    margin-top: 5px;
 
     .item {
-        margin-bottom: 20px;
+        margin-bottom: 10px;
     }
 
     .questiontitle {
@@ -438,17 +412,25 @@ const isInput = ref(store.isInput)
     .num {
         margin-bottom: 10px;
         font-size: 20px;
+        color: #ffffff; /* 确保数字清晰可读 */
     }
 
     .el-radio-button,
-    .el-radio-button__innerp {
+    .el-radio-button__inner {
         margin-bottom: 10px;
     }
 }
 
+.bt{
+    display: flex;
+    align-items: center;
+}
+
 @media only screen and (max-width: 768px) {
     .title .item {
-        margin-right: 0px;
+        margin: 10px 0;
     }
 }
 </style>
+
+
